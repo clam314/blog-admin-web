@@ -10,7 +10,7 @@
           <div class="header">
             <a href="/">
               <img src="~@/assets/logo.svg" class="logo" alt="logo">
-              <span class="title">Ant Design</span>
+              <span class="title">Blog Back End</span>
             </a>
           </div>
           <div class="desc">
@@ -21,13 +21,13 @@
         <router-view />
 
         <div class="footer">
-          <div class="links">
-            <a href="_self">帮助</a>
-            <a href="_self">隐私</a>
-            <a href="_self">条款</a>
-          </div>
+<!--          <div class="links">-->
+<!--            <a href="_self">帮助</a>-->
+<!--            <a href="_self">隐私</a>-->
+<!--            <a href="_self">条款</a>-->
+<!--          </div>-->
           <div class="copyright">
-            Copyright &copy; 2018 vueComponent
+            Copyright &copy; 2020 clam314
           </div>
         </div>
       </div>
@@ -70,8 +70,8 @@ export default {
   .container {
     width: 100%;
     min-height: 100%;
-    background: #f0f2f5 url(~@/assets/background.svg) no-repeat 50%;
-    background-size: 100%;
+    background: #f0f2f5 url(~@/assets/background-1.jpg) no-repeat 50%;
+    background-size: cover ;
     //padding: 50px 0 84px;
     position: relative;
 

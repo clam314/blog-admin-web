@@ -89,7 +89,7 @@
         >{{ $t('user.login.login') }}</a-button>
       </a-form-item>
 
-      <div class="user-login-other">
+      <div class="user-login-other" v-show="false">
         <span>{{ $t('user.login.sign-in-with') }}</span>
         <a>
           <a-icon class="item-icon" type="alipay-circle"></a-icon>
@@ -167,6 +167,13 @@ export default {
       callback()
     },
     handleTabClick (key) {
+      if (key !== 'tab1') {
+        this.$notification['info']({
+          message: '暂时未支持',
+          description: '目前仅开能够账号和密码登录，其他登录方式待开放。'
+        })
+        return
+      }
       this.customActiveKey = key
       // this.form.resetFields()
     },
