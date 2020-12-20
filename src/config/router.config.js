@@ -13,14 +13,15 @@ export const asyncRouterMap = [
     name: 'index',
     component: BasicLayout,
     meta: { title: 'menu.home' },
-    redirect: '/dashboard/workplace',
+    redirect: '/dashboard/analysis/:pageNo([1-9]\\d*)?',
     children: [
       // dashboard
       {
         path: '/dashboard',
         name: 'dashboard',
-        redirect: '/dashboard/workplace',
+        redirect: '/dashboard/analysis',
         component: RouteView,
+        hideChildrenInMenu: true,
         meta: { title: 'menu.dashboard', keepAlive: true, icon: bxAnaalyse, permission: ['dashboard'] },
         children: [
           {
@@ -36,7 +37,8 @@ export const asyncRouterMap = [
         path: '/list',
         name: 'list',
         component: RouteView,
-        redirect: '/list/table-list',
+        redirect: '/list/search/article',
+        hideChildrenInMenu: true,
         meta: { title: 'menu.list', icon: 'table', permission: ['table'] },
         children: [
           {
@@ -57,12 +59,6 @@ export const asyncRouterMap = [
                 name: 'SearchProjects',
                 component: () => import('../views/list/search/Projects'),
                 meta: { title: 'menu.list.search-list.projects', permission: ['table'] }
-              },
-              {
-                path: '/list/search/application',
-                name: 'SearchApplications',
-                component: () => import('../views/list/search/Applications'),
-                meta: { title: 'menu.list.search-list.applications', permission: ['table'] }
               }
             ]
           }
@@ -152,6 +148,12 @@ export const asyncRouterMap = [
     ]
   },
   {
+    path: '/edit',
+    component: () => import(/* webpackChunkName: "fail" */ '@/views/edit'),
+    name: 'Edit',
+    meta: { title: '文章编辑', icon: 'user', keepAlive: true, permission: ['user'] }
+  },
+  {
     path: '*',
     redirect: '/404',
     hidden: true
@@ -191,7 +193,6 @@ export const constantRouterMap = [
       }
     ]
   },
-
   {
     path: '/404',
     component: () => import(/* webpackChunkName: "fail" */ '@/views/exception/404')

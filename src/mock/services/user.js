@@ -756,5 +756,17 @@ const userNav = (options) => {
   return json
 }
 
+const userTags = (options) => {
+  return builder([
+    '很有想法的',
+    '专注设计',
+    '辣~',
+    '大长腿',
+    '川妹子',
+    '海纳百川'
+  ])
+}
+
 Mock.mock(/\/api\/user\/info/, 'get', info)
 Mock.mock(/\/api\/user\/nav/, 'get', userNav)
+Mock.mock(/\/api\/user\/tags/, 'get', userTags)

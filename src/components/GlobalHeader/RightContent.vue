@@ -8,6 +8,7 @@
 <script>
 import AvatarDropdown from './AvatarDropdown'
 import SelectLang from '@/components/SelectLang'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'RightContent',
@@ -35,15 +36,21 @@ export default {
   },
   data () {
     return {
-      showMenu: true,
-      currentUser: {}
+      showMenu: true
     }
   },
   computed: {
+    ...mapGetters(['nickname', 'avatar']),
     wrpCls () {
       return {
         'ant-pro-global-header-index-right': true,
         [`ant-pro-global-header-index-${(this.isMobile || !this.topMenu) ? 'light' : this.theme}`]: true
+      }
+    },
+    currentUser () {
+      return {
+        name: this.nickname,
+        avatar: this.avatar
       }
     }
   },

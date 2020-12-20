@@ -24,8 +24,6 @@ const getActiveKey = (path) => {
       return '1'
     case '/list/search/project':
       return '2'
-    case '/list/search/application':
-      return '3'
     default:
       return '1'
   }
@@ -36,8 +34,7 @@ export default {
     return {
       tabList: [
         { key: '1', tab: '文章' },
-        { key: '2', tab: '项目' },
-        { key: '3', tab: '应用' }
+        { key: '2', tab: '评论' }
       ],
       tabActiveKey: '1',
       search: true
@@ -60,11 +57,8 @@ export default {
         case '2':
           this.$router.push('/list/search/project')
           break
-        case '3':
-          this.$router.push('/list/search/application')
-          break
         default:
-          this.$router.push('/workplace')
+          this.$router.push('/')
       }
     }
   }

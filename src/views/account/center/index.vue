@@ -27,7 +27,7 @@
 
           <div class="account-center-tags">
             <div class="tagsTitle">标签</div>
-            <div>
+            <a-spin :spinning="tagsSpinning">
               <template v-for="(tag, index) in tags">
                 <a-tooltip v-if="tag.length > 20" :key="tag" :title="tag">
                   <a-tag
@@ -57,23 +57,6 @@
               <a-tag v-else @click="showTagInput" style="background: #fff; borderStyle: dashed;">
                 <a-icon type="plus"/>New Tag
               </a-tag>
-            </div>
-          </div>
-          <a-divider :dashed="true"/>
-
-          <div class="account-center-team">
-            <div class="teamTitle">团队</div>
-            <a-spin :spinning="teamSpinning">
-              <div class="members">
-                <a-row>
-                  <a-col :span="12" v-for="(item, index) in teams" :key="index">
-                    <a>
-                      <a-avatar size="small" :src="item.avatar"/>
-                      <span class="member">{{ item.name }}</span>
-                    </a>
-                  </a-col>
-                </a-row>
-              </div>
             </a-spin>
           </div>
         </a-card>
@@ -99,7 +82,7 @@
 
 <script>
 import { PageView, RouteView } from '@/layouts'
-import { BasicSetting, Security, Custom, Binding, Notification } from './page'
+import { BasicSetting, Binding, Custom, Notification, Security } from './page'
 
 import { mapGetters } from 'vuex'
 
@@ -115,13 +98,11 @@ export default {
   },
   data () {
     return {
-      tags: ['很有想法的', '专注设计', '辣~', '大长腿', '川妹子', '海纳百川'],
+      tags: [],
+      tagsSpinning: true,
 
       tagInputVisible: false,
       tagInputValue: '',
-
-      teams: [],
-      teamSpinning: true,
 
       tabListNoTitle: [
         {
@@ -152,13 +133,14 @@ export default {
     ...mapGetters(['nickname', 'avatar'])
   },
   mounted () {
-    this.getTeams()
+    this.getTags()
   },
   methods: {
-    getTeams () {
-      this.$http.get('/workplace/teams').then(res => {
-        this.teams = res.result
-        this.teamSpinning = false
+    getTags () {
+      this.$http.get('/api/user/tags').then(res => {
+        console.log(res)
+        this.tags = res.result
+        this.tagsSpinning = false
       })
     },
 
@@ -167,8 +149,7 @@ export default {
     },
 
     handleTagClose (removeTag) {
-      const tags = this.tags.filter(tag => tag !== removeTag)
-      this.tags = tags
+      this.tags = this.tags.filter(tag => tag !== removeTag)
     },
 
     showTagInput () {
@@ -265,34 +246,7 @@ export default {
     }
   }
 
-  .account-center-team {
-    .members {
-      a {
-        display: block;
-        margin: 12px 0;
-        line-height: 24px;
-        height: 24px;
-        .member {
-          font-size: 14px;
-          color: rgba(0, 0, 0, 0.65);
-          line-height: 24px;
-          max-width: 100px;
-          vertical-align: top;
-          margin-left: 12px;
-          transition: all 0.3s;
-          display: inline-block;
-        }
-        &:hover {
-          span {
-            color: #1890ff;
-          }
-        }
-      }
-    }
-  }
-
-  .tagsTitle,
-  .teamTitle {
+  .tagsTitle{
     font-weight: 500;
     color: rgba(0, 0, 0, 0.85);
     margin-bottom: 12px;
