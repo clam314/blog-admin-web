@@ -86,9 +86,11 @@
           :activeTabKey="noTitleKey"
           @tabChange="key => handleTabChange(key, 'noTitleKey')"
         >
-          <article-page v-if="noTitleKey === 'article'"></article-page>
-          <app-page v-else-if="noTitleKey === 'app'"></app-page>
-          <project-page v-else-if="noTitleKey === 'project'"></project-page>
+          <basic-setting v-if="noTitleKey === 'setting'"></basic-setting>
+          <security v-else-if="noTitleKey === 'security'"></security>
+          <custom v-else-if="noTitleKey === 'custom'"></custom>
+          <binding v-else-if="noTitleKey === 'binding'"></binding>
+          <notification v-else-if="noTitleKey === 'notification'"></notification>
         </a-card>
       </a-col>
     </a-row>
@@ -97,7 +99,7 @@
 
 <script>
 import { PageView, RouteView } from '@/layouts'
-import { AppPage, ArticlePage, ProjectPage } from './page'
+import { BasicSetting, Security, Custom, Binding, Notification } from './page'
 
 import { mapGetters } from 'vuex'
 
@@ -105,9 +107,11 @@ export default {
   components: {
     RouteView,
     PageView,
-    AppPage,
-    ArticlePage,
-    ProjectPage
+    BasicSetting,
+    Security,
+    Custom,
+    Binding,
+    Notification
   },
   data () {
     return {
@@ -121,19 +125,27 @@ export default {
 
       tabListNoTitle: [
         {
-          key: 'article',
-          tab: '文章(8)'
+          key: 'setting',
+          tab: '基本设置'
         },
         {
-          key: 'app',
-          tab: '应用(8)'
+          key: 'security',
+          tab: '安全设置'
         },
         {
-          key: 'project',
-          tab: '项目(8)'
+          key: 'custom',
+          tab: '个性化'
+        },
+        {
+          key: 'binding',
+          tab: '账号绑定'
+        },
+        {
+          key: 'notification',
+          tab: '新消息通知'
         }
       ],
-      noTitleKey: 'app'
+      noTitleKey: 'setting'
     }
   },
   computed: {
