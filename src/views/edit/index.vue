@@ -1,10 +1,9 @@
 <template>
-  <a-layout >
+  <a-layout style="min-height: 100vh">
     <a-layout-sider
       @collapse="handleCollapsed"
       v-model="collapsed"
-      collapsible
-      :style="{ overflow: 'auto', height: '100vh', position: 'fixed', left: 0}">
+      collapsible>
       <div class="menu-top-btn menu-transition" @click="() => {this.$router.back()}">
         <a-icon type="arrow-left"/>
         <span>{{ collapsed?'':'返回' }}</span>
@@ -35,6 +34,27 @@
         </a-menu-item>
       </a-menu>
     </a-layout-sider>
+    <a-layout>
+      <a-layout-sider
+        :style="[{maxWidth : articleListWidth + 'px'},{minWidth : articleListWidth + 'px'},{backgroundColor:'lightgray'},{width : articleListWidth + 'px'}]"
+        @collapse="handleCollapsed"
+        v-model="collapsed"
+        >
+        <div class="menu-top-btn menu-transition" @click="() => {this.$router.back()}">
+          <a-icon type="arrow-left"/>
+          <span>{{ collapsed?'':'返回' }}</span>
+        </div>
+        <a-button
+          class="menu-add-dir-btn menu-transition"
+          type="primary"
+          shape="round"
+          icon="folder-add"
+        >{{ collapsed?'':'新建文件' }}
+        </a-button>
+      </a-layout-sider>
+      <a-layout-content style="margin: 0 0px ;width: 100%">
+      </a-layout-content>
+    </a-layout>
   </a-layout>
 </template>
 
@@ -66,6 +86,11 @@ export default {
   methods: {
     handleCollapsed (collapsed, type) {
       console.log(collapsed, type)
+    }
+  },
+  computed: {
+    articleListWidth () {
+      return this.collapsed ? 200 : 400
     }
   }
 }
