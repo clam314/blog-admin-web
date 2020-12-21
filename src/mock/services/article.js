@@ -1,5 +1,6 @@
 import Mock from 'mockjs2'
 import { builder, getQueryParameters } from '../util'
+// import options from 'vue-quill-editor/src/options'
 
 const titles = [
   'Alipay',
@@ -38,6 +39,7 @@ const content = '段落示意：蚂蚁金服设计平台 ant.design，用最小�
 const description = '在中台产品的研发过程中，会出现不同的设计规范和实现方式，但其中往往存在很多类似的页面和组件，这些类似的组件会被抽离成一套标准规范。'
 const href = 'https://ant.design'
 
+// eslint-disable-next-line no-unused-vars
 const article = (options) => {
   const queryParameters = getQueryParameters(options)
   console.log('queryParameters', queryParameters)
@@ -86,4 +88,40 @@ const article = (options) => {
   return builder(data)
 }
 
-Mock.mock(/\/list\/article/, 'get', article)
+const articleList = (options) => {
+  const queryParameters = getQueryParameters(options)
+  console.log('queryParameters', queryParameters)
+  if (queryParameters && !queryParameters.count) {
+    queryParameters.count = 5
+  }
+  const data = []
+  for (let i = 0; i < queryParameters.count; i++) {
+    const tmpKey = i + 1
+    data.push({
+      tid: tmpKey,
+      uid: tmpKey,
+      did: tmpKey,
+      title: titles[i % 8],
+      description: description,
+      des_image: null,
+      content: 'https://github.com/clam314/clam314/blob/main/README.md',
+      file_type: 'md',
+      created: Mock.mock('@datetime'),
+      updated: Mock.mock('@datetime'),
+      catalog: Mock.mock('@string(8)'),
+      published: Mock.mock('@integer(0, 1)'),
+      role: [],
+      reads: Mock.mock('@integer(1, 999)'),
+      comments: Mock.mock('@integer(1, 999)'),
+      status: Mock.mock('@integer(0, 1)'),
+      isTop: Mock.mock('@integer(0, 1)'),
+      sort: Mock.mock('@integer(0, 1)'),
+      tags: Mock.mock({ 'array|1-6': ['Hello', 'Mock.js', '!'] })
+    })
+  }
+  console.log('articallist', data)
+  return builder(data)
+}
+
+// Mock.mock(/\/list\/article/, 'get', article)
+Mock.mock(/\/list\/articleMenuList/, 'get', articleList)
