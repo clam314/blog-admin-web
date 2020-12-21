@@ -1,28 +1,30 @@
 <template>
   <div
     v-infinite-scroll="onLoadMore"
-    class="demo-infinite-container"
+    class="infinite-container"
     :infinite-scroll-disabled="busy"
     :infinite-scroll-distance="10"
   >
     <a-list
       :data-source="data"
-      item-layout="vertical"
+      item-layout="horizontal"
       class="list"
     >
-      <a-list-item slot="renderItem" slot-scope="item">
-        <a slot="actions">edit</a>
-        <a slot="actions">more</a>
-        <a-list-item-meta :description="collapsed ?'' : item.description.slice(0,40)">
-          <a slot="title">{{ collapsed ?item.title.slice(0,20) : item.title }}</a>
+      <a-list-item slot="renderItem" slot-scope="item" class="list-item">
+        <a-list-item-meta>
+          <a slot="title" class="list-title">{{ item.title }}</a>
           <a-avatar
+            class="list-icon"
             slot="avatar"
             shape="square"
             :icon="fileIcon(item.content)"
           />
+          <div slot="description" :class="!collapsed? 'list-description' : 'list-description-collapsed'">
+            {{ ellipsis(item.description,30) }}
+          </div>
         </a-list-item-meta>
       </a-list-item>
-      <div v-if="true" class="demo-loading-container">
+      <div v-if="true" class="loading-container">
         <a-spin />
       </div>
     </a-list>
@@ -82,30 +84,71 @@ export default {
       })
     },
     fileIcon (filePath) {
-      console.log(filePath)
-      const type = getFileTypeForIcon(filePath)
-      console.log(type)
-      return type
+      return getFileTypeForIcon(filePath)
+    },
+    ellipsis (str, limit) {
+      if (str.length > limit) {
+        return str.slice(0, limit) + '...'
+      } else {
+        return str
+      }
     }
   }
 }
 </script>
 
 <style lang="less" scoped>
-.demo-infinite-container {
+@import "~ant-design-vue/es/style/themes/default.less";
+
+.infinite-container {
   overflow: auto;
-  height: calc(100vh - 45px);
-  padding: 4px 5px 4px 15px;
+  height: calc(100vh - 48px);
   &::-webkit-scrollbar {
     width: 0;
   }
+
+  .list-item{
+    max-height: 90px;
+    padding: 10px 15px 10px 15px;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    text-align: justify;
+    -webkit-line-clamp: 2; //行数
+    overflow: hidden;
+    text-overflow: clip;
+  }
+
+  .list-title{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .list-description{
+    opacity: 1;
+    height: 60px;
+    transition: opacity 0.3s @ease-in-out, height 0.3s @ease-in-out;
+  }
+
+  .list-description-collapsed{
+    opacity: 0;
+    height: 0;
+    transition: opacity 0.3s @ease-in-out, height 0.3s @ease-in-out;
+  }
+
+  .list-icon {
+    background-color: @primary-color;
+  }
+
+  .list-item-selected{
+    background-color: rgba(0,0,0,0.1);
+  }
 }
 
-.demo-loading-container {
+.loading-container {
   position: relative;
   bottom: 50%;
   width: 100%;
   text-align: center;
 }
-
 </style>

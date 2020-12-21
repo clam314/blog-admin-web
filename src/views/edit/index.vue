@@ -47,7 +47,8 @@
           <span :class="!collapsed ? 'article-list-wrapper-text':'article-list-wrapper-text-collapsed'">新建文档</span>
         </div>
       </a-layout-sider>
-      <a-layout-content style="margin: 0 0;width: 100%">
+      <a-layout-content style="margin: 0 0; width: 100% ;height: 100%">
+        <article-editor/>
       </a-layout-content>
     </a-layout>
   </a-layout>
@@ -55,16 +56,19 @@
 
 <script>
 import ArticleMenuList from '@/views/edit/ArticleMenuList'
+import ArticleEditor from '@/views/edit/ArticleEditor'
 
 export default {
   components: {
-    ArticleMenuList
+    ArticleMenuList,
+    ArticleEditor
   },
   data () {
   return {
     collapsed: false,
     addBtnTitle: '新建文件',
     selectedKeys: [1],
+    mdValue: '',
     menus: [{
       did: 1,
       dirName: '文件夹1'
@@ -90,12 +94,13 @@ export default {
   },
   computed: {
     articleListWidth () {
-      return this.collapsed ? 200 : 400
+      return this.collapsed ? 120 : 300
     }
   }
 }
 </script>
 <style lang="less" scoped>
+@import "~ant-design-vue/es/style/themes/default.less";
 
 .menu-top-btn{
   height: 50px;
@@ -141,22 +146,29 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 45px;
-    background-color: whitesmoke;
+    height: 48px;
+    background-color: @primary-color;
+    color: white;
     cursor: pointer;
+    font-weight: 400;
+    font-size: 14px;
+
+    &:hover{
+      background-color: color(~`colorPalette('@{primary-color}', 5) `);
+      color: white;
+    }
   }
   &-text{
     margin-left: 15px;
     opacity: 1;
-    transition: opacity 0.3s cubic-bezier(0.645, 0.045, 0.355, 1) ,margin 0.3s ease-in-out;
+    transition: opacity 0.3s @ease-in-out ,margin 0.3s @ease-in-out;
   }
   &-text-collapsed{
     margin-left: 0;
     opacity: 0;
     white-space: nowrap;
     width: 0;
-    transition: opacity 0.3s cubic-bezier(0.645, 0.045, 0.355, 1) ,margin 0.3s ease-in-out ,width 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+    transition: opacity 0.2s @ease-in-out ,margin 0.3s @ease-in-out ,width 0.3s @ease-in-out;
   }
 }
-
 </style>
