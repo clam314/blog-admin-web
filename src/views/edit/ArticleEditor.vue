@@ -1,44 +1,66 @@
 <template>
-  <div class="editor-wrapper">
-    <div class="editor-header">
+  <a-layout class="editor-wrapper">
+    <a-layout-header class="editor-header">
       <a-input
         class="editor-title"
         v-model="markdownForm.title"
         size="large">
-        <a-icon slot="addonAfter" type="setting" />
+        <a-icon slot="addonAfter" type="setting" @click="openInfoDrawer"/>
+        <a-icon slot="addonAfter" type="delete" @click="deleteArticle" />
       </a-input>
-    </div>
-    <mavon-editor
-      class="editor-md"
-      ref="md"
-      @save="save"
-      @imgAdd="imgAdd"
-      @imgDel="imgDel"
-      v-model="markdownForm.contentMarkdown"
-      :codeStyle="markdown.codeStyle"
-      :toolbars="markdown.toolbars"
-      :toolbarsBackground="markdown.toolbarsBackground"
-      :editorBackground="markdown.editorBackground"
-      :style="{backgroundColor: markdown.editorBackground}"
-      :previewBackground="markdown.previewBackground"
-    />
-  </div>
+    </a-layout-header>
+    <a-layout-content>
+      <mavon-editor
+        class="editor-md"
+        ref="md"
+        @save="save"
+        @imgAdd="imgAdd"
+        @imgDel="imgDel"
+        v-model="markdownForm.contentMarkdown"
+        :codeStyle="markdown.codeStyle"
+        :toolbars="markdown.toolbars"
+        :toolbarsBackground="markdown.toolbarsBackground"
+        :editorBackground="markdown.editorBackground"
+        :style="{backgroundColor: markdown.editorBackground}"
+        :previewBackground="markdown.previewBackground"
+      />
+    </a-layout-content>
+    <a-drawer
+      title="Basic Drawer"
+      width="350"
+      :placement="placement"
+      :closable="false"
+      :visible="infoDrawer.visible"
+      @close="closeInfoDrawer"
+    >
+      <p>Some contents...</p>
+      <p>Some contents...</p>
+      <p>Some contents...</p>
+    </a-drawer>
+  </a-layout>
 </template>
 
 <script>
 import { uploadImg } from '@/api/articleImg'
 import { getMarkdownArticle, saveMarkdownArticle } from '@/api/article'
+import defaultSettings from '@/config/defaultSettings'
 
 const defaultTitle = '请输入标题...'
 export default {
   name: 'ArticleEditor',
+  props: {
+    markdownFile: {
+     type: Object,
+     default: null
+    }
+  },
   data () {
     return {
       markdown: {
         codeStyle: 'atom-one-dark',
-        toolbarsBackground: '#3c3f41',
-        editorBackground: '#f0f5ff',
-        previewBackground: '#f0f5ff',
+        editorBackground: '#fafafa',
+        toolbarsBackground: defaultSettings.primaryColor,
+        previewBackground: '#fafafa',
         toolbars: {
           bold: true, // 粗体
           italic: true, // 斜体
@@ -85,7 +107,10 @@ export default {
         ]
       },
       lastSaveTime: null,
-      timer: null
+      timer: null,
+      infoDrawer: {
+        visible: false
+      }
     }
   },
   created () {
@@ -147,32 +172,72 @@ export default {
     imgDel (pos, url) { // 删除图片，并不是修改就会触发，仅支持工具栏操作
       console.log(pos)
       console.log(url)
+    },
+    deleteArticle () {
+      if (this.markdownFile) {
+        console.log(...this.markdownFile)
+      } else {
+        this.$message.error('文件信息为空，无法删除！')
+      }
+    },
+    openInfoDrawer () {
+      this.infoDrawer.visible = true
     }
   }
 }
 </script>
 
 <style lang="less" scoped>
-@contentHeight: 100%;
-@titleHeight: 3%;
+@import "~ant-design-vue/es/style/themes/default.less";
 
 .editor-wrapper{
   width: 100%;
-  height: @contentHeight;
+  height: 100%;
 
   .editor-header{
-    height: @titleHeight;
+    height: auto;
+    line-height: normal;
+    padding: 0 0;
     .editor-title{
-      height: 100%;
+      /deep/ [type=text][class~=ant-input] {
+        border-color: transparent;
+        border-radius: 0;
+        background-color: #fafafa;
+      }
+    }
+    /deep/ .ant-input-group-addon{
+      border-color: transparent;
+      border-radius: 0;
+      background-color: #fafafa;
+      font-size: 18px;
+      i{
+        margin-right: 20px;
+        cursor: pointer;
+      }
+      i:hover{
+        color: @primary-color;
+      }
     }
   }
 
   .editor-md{
     z-index: 100;
-    height: @contentHeight - @titleHeight ;
+    height: 100%;
 
+    //覆盖MD工具栏的样式
     /deep/ .v-note-op{
       border-radius: 0 0 0 0;
+    }
+    @icon-color: #fafafa;
+    @icon-color-hover: #262626;
+    /deep/ [type=button]{
+      color: @icon-color !important;
+    }
+    /deep/ [class~=selected]{
+      color: @icon-color-hover !important;
+    }
+    /deep/ .op-icon:hover{
+      color: @icon-color-hover !important;
     }
   }
 }

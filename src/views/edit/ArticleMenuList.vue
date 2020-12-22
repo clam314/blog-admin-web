@@ -8,21 +8,29 @@
     <a-list
       :data-source="data"
       item-layout="horizontal"
+      :split="false"
       class="list"
     >
-      <a-list-item slot="renderItem" slot-scope="item" class="list-item">
-        <a-list-item-meta>
-          <a slot="title" class="list-title">{{ item.title }}</a>
-          <a-avatar
-            class="list-icon"
-            slot="avatar"
-            shape="square"
-            :icon="fileIcon(item.content)"
-          />
-          <div slot="description" :class="!collapsed? 'list-description' : 'list-description-collapsed'">
-            {{ ellipsis(item.description,30) }}
-          </div>
-        </a-list-item-meta>
+      <a-list-item
+        slot="renderItem"
+        slot-scope="item"
+        class="list-item"
+        :class="{'list-item-selected' : item===selectedItem}"
+        @click="() => {onSelectChange(item)}">
+        <div class="list-item-content" >
+          <a-list-item-meta>
+            <a slot="title" class="list-title">{{ item.title }}</a>
+            <a-avatar
+              class="list-icon"
+              slot="avatar"
+              shape="square"
+              :icon="fileIcon(item.content)"
+            />
+            <div slot="description" class="list-description" :class="!collapsed? 'list-description-normal' : 'list-description-collapsed'">
+              {{ ellipsis(item.description,14) }}
+            </div>
+          </a-list-item-meta>
+        </div>
       </a-list-item>
       <div v-if="true" class="loading-container">
         <a-spin />
@@ -50,7 +58,7 @@ export default {
     return {
       loading: false,
       busy: false,
-      selectedItem: false,
+      selectedItem: null,
       iconColor: defaultSettings.primaryColor,
       data: []
     }
@@ -61,12 +69,15 @@ export default {
     this.getData(res => {
       this.loading = false
       this.busy = false
-      this.data = res.result
+      if (res.result) {
+        this.data = res.result
+        this.selectedItem = this.data[0]
+      }
     })
   },
   methods: {
     getData (callback) {
-      this.$http.get('/list/articleMenuList').then(res => {
+      this.$http.get('/list/articleMenus').then(res => {
         console.log(res)
         callback(res)
       })
@@ -83,12 +94,15 @@ export default {
         })
       })
     },
+    onSelectChange (item) {
+      this.selectedItem = item
+    },
     fileIcon (filePath) {
       return getFileTypeForIcon(filePath)
     },
     ellipsis (str, limit) {
       if (str.length > limit) {
-        return str.slice(0, limit) + '...'
+        return str.slice(0, limit) + '……'
       } else {
         return str
       }
@@ -108,14 +122,36 @@ export default {
   }
 
   .list-item{
-    max-height: 90px;
-    padding: 10px 15px 10px 15px;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    text-align: justify;
-    -webkit-line-clamp: 2; //行数
-    overflow: hidden;
-    text-overflow: clip;
+    max-height: 85px;
+    cursor: pointer;
+    background-color: transparent;
+    transition: background-color .3s @ease-in-out;
+    &:after{
+      border-right: 3px solid  @primary-color;
+      content: '';
+      height: 84px;
+      -webkit-transform: scaleY(.0001);
+      transform: scaleY(.0001);
+      opacity: 0;
+      //transition: transform .15s @ease-in-out, opacity .15s @ease-in-out
+      transition: transform .3s @ease-in-out,opacity .3s @ease-in-out,-webkit-transform .3s @ease-in-out;
+    }
+
+    &-content{
+      padding: 0 15px;
+    }
+
+    &-selected{
+      background-color: #fafafa;
+      transition: background-color .3s @ease-in-out;
+    }
+
+    &-selected:after{
+      -webkit-transform: scaleY(1);
+      transform: scaleY(1);
+      opacity: 1;
+      transition: transform .3s @ease-in-out,opacity .3s @ease-in-out,-webkit-transform .3s @ease-in-out;
+    }
   }
 
   .list-title{
@@ -124,16 +160,22 @@ export default {
     white-space: nowrap;
   }
 
-  .list-description{
-    opacity: 1;
-    height: 60px;
-    transition: opacity 0.3s @ease-in-out, height 0.3s @ease-in-out;
-  }
+  .list-description {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 
-  .list-description-collapsed{
-    opacity: 0;
-    height: 0;
-    transition: opacity 0.3s @ease-in-out, height 0.3s @ease-in-out;
+    &-normal{
+      opacity: 1;
+      height: auto;
+      transition: opacity 0.3s @ease-in-out, height 0.3s @ease-in-out;
+    }
+
+    &-collapsed{
+      opacity: 0;
+      height: 0;
+      transition: opacity 0.3s @ease-in-out, height 0.3s @ease-in-out;
+    }
   }
 
   .list-icon {

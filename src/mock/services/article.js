@@ -39,6 +39,14 @@ const content = '段落示意：蚂蚁金服设计平台 ant.design，用最小�
 const description = '在中台产品的研发过程中，会出现不同的设计规范和实现方式，但其中往往存在很多类似的页面和组件，这些类似的组件会被抽离成一套标准规范。'
 const href = 'https://ant.design'
 
+const descList = [
+  description,
+  content,
+  href,
+  'fafsafsafaaaaaaaawwwwfffffffffffff',
+  'dwagwadfwad'
+]
+
 // eslint-disable-next-line no-unused-vars
 const article = (options) => {
   const queryParameters = getQueryParameters(options)
@@ -59,7 +67,8 @@ const article = (options) => {
       percent: Mock.mock('@integer(1, 999)'),
       like: Mock.mock('@integer(1, 999)'),
       message: Mock.mock('@integer(1, 999)'),
-      description: description,
+      // eslint-disable-next-line standard/computed-property-even-spacing
+      description: descList[ i % 5],
       href: href,
       title: titles[ i % 8 ],
       updatedAt: Mock.mock('@datetime'),
@@ -88,7 +97,7 @@ const article = (options) => {
   return builder(data)
 }
 
-const articleList = (options) => {
+const articles = (options) => {
   const queryParameters = getQueryParameters(options)
   console.log('queryParameters', queryParameters)
   if (queryParameters && !queryParameters.count) {
@@ -102,7 +111,7 @@ const articleList = (options) => {
       uid: tmpKey,
       did: tmpKey,
       title: titles[i % 8],
-      description: description,
+      description: descList[i % 5],
       des_image: null,
       content: 'https://github.com/clam314/clam314/blob/main/README.md',
       file_type: 'md',
@@ -124,4 +133,5 @@ const articleList = (options) => {
 }
 
 // Mock.mock(/\/list\/article/, 'get', article)
-Mock.mock(/\/list\/articleMenuList/, 'get', articleList)
+// Mock.mock(/\/list\/articleMenuList/, 'get', articleList)
+Mock.mock(/\/list\/articleMenus/, 'get', articles)
