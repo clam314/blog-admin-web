@@ -19,7 +19,7 @@
         @click="() => {onSelectChange(item)}">
         <div class="list-item-content" >
           <a-list-item-meta>
-            <a slot="title" class="list-title">{{ item.title }}</a>
+            <a slot="title" class="list-title">{{ ellipsis(item.title,25) }}</a>
             <a-avatar
               class="list-icon"
               slot="avatar"
@@ -52,6 +52,10 @@ export default {
     collapsed: {
       type: Boolean,
       default: false
+    },
+    folder: {
+      type: Object,
+      default: null
     }
   },
   data () {
@@ -71,13 +75,31 @@ export default {
       this.busy = false
       if (res.result) {
         this.data = res.result
-        this.selectedItem = this.data[0]
+        this.onSelectChange(this.data[0])
       }
     })
   },
+  watch: {
+    folder (val) {
+      if (val) {
+        console.log(val)
+        this.loading = false
+        this.busy = false
+        this.data = []
+        this.getData(res => {
+          this.loading = false
+          this.busy = false
+          if (res.result) {
+            this.data = res.result
+            this.onSelectChange(this.data[0])
+          }
+        })
+      }
+    }
+  },
   methods: {
     getData (callback) {
-      this.$http.get('/list/articleMenus').then(res => {
+      this.$http.get('/list/articles').then(res => {
         console.log(res)
         callback(res)
       })
@@ -96,6 +118,7 @@ export default {
     },
     onSelectChange (item) {
       this.selectedItem = item
+      this.$emit('changeSelect', item)
     },
     fileIcon (filePath) {
       return getFileTypeForIcon(filePath)
@@ -133,7 +156,6 @@ export default {
       -webkit-transform: scaleY(.0001);
       transform: scaleY(.0001);
       opacity: 0;
-      //transition: transform .15s @ease-in-out, opacity .15s @ease-in-out
       transition: transform .3s @ease-in-out,opacity .3s @ease-in-out,-webkit-transform .3s @ease-in-out;
     }
 
@@ -155,6 +177,7 @@ export default {
   }
 
   .list-title{
+    width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

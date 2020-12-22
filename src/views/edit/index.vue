@@ -8,12 +8,8 @@
         <a-icon :class="{'menu-top-btn-action-i': collapsed}" type="arrow-left"/>
         <span :class="{'menu-top-btn-action-span': !collapsed}">返回</span>
       </div>
-      <a-button
-        class="menu-add-dir-btn menu-transition"
-        type="primary"
-        shape="round"
-        icon="folder-add"
-      >{{ collapsed?'':'新建文件夹' }}
+      <a-button class="menu-add-dir-btn menu-transition" type="primary" shape="round" icon="folder-add">
+        {{ collapsed?'':'新建文件夹' }}
       </a-button>
       <a-menu
         class="menu-wrapper"
@@ -21,19 +17,22 @@
         mode="inline"
         theme="dark"
         :inline-collapsed="collapsed"
-      >
-        <a-menu-item v-for=" dir in menus" :key="dir.did">
-          <a-icon :type="menus[selectedKeys-1] !== dir?'folder':'folder-open'" />
-          <span>{{ dir.dirName }}</span>
-          <a-icon
-            type="edit"
-            style="right: 0;position: absolute; top: 35%"
-            v-if="!collapsed && menus[selectedKeys-1] === dir"
-            @click="() => {$message.info('只是一个DEMO') }"
-          />
-        </a-menu-item>
+        @click="handleMenuClick">
+        <template v-for="folder in folders">
+          <a-menu-item :key="folder.fid">
+            <a-icon :type="selectedKeys[0] !== folder.fid?'folder':'folder-open'" />
+            <span>{{ folder.name }}</span>
+            <a-icon
+              type="edit"
+              style="right: 0;position: absolute; top: 35%"
+              v-if="!collapsed && selectedKeys[0] === folder.fid"
+              @click="() => {$message.info('只是一个DEMO') }"
+            />
+          </a-menu-item>
+        </template>
       </a-menu>
     </a-layout-sider>
+
     <a-layout>
       <a-layout-sider
         class="article-list-wrapper"
@@ -41,14 +40,15 @@
         @collapse="handleCollapsed"
         v-model="collapsed"
       >
-        <article-menu-list :collapsed="collapsed"/>
+        <article-menu-list :collapsed="collapsed" :folder="selectedFolder" @changeSelect="onSelected"/>
         <div class="article-list-wrapper-btn">
           <a-icon type="file-add" style="font-size: 16px;"/>
           <span :class="!collapsed ? 'article-list-wrapper-text':'article-list-wrapper-text-collapsed'">新建文档</span>
         </div>
       </a-layout-sider>
+
       <a-layout-content style="margin: 0 0; width: 100% ;height: 100%">
-        <article-editor/>
+        <article-editor :article="selectedArticle"/>
       </a-layout-content>
     </a-layout>
   </a-layout>
@@ -64,32 +64,43 @@ export default {
     ArticleEditor
   },
   data () {
-  return {
-    collapsed: false,
-    addBtnTitle: '新建文件',
-    selectedKeys: [1],
-    mdValue: '',
-    menus: [{
-      did: 1,
-      dirName: '文件夹1'
-    }, {
-      did: 2,
-      dirName: '文件夹2'
-    }, {
-      did: 3,
-      dirName: '文件夹3'
-    }, {
-      did: 4,
-      dirName: '文件夹4'
-    }, {
-      did: 5,
-      dirName: '文件夹5'
-    }]
-  }
+    return {
+      loading: false,
+      collapsed: false,
+      addBtnTitle: '新建文件',
+      selectedKeys: [],
+      mdValue: '',
+      folders: [],
+      selectedArticle: null,
+      selectedFolder: null
+    }
+  },
+  mounted () {
+    this.loading = true
+    this.getDate(res => {
+      this.loading = false
+      this.folders = res.result
+      this.selectedKeys = [this.folders[0].fid]
+    })
   },
   methods: {
+    getDate (callback) {
+      this.$http.get('/list/folders').then(res => {
+        console.log(res)
+        callback(res)
+      })
+    },
     handleCollapsed (collapsed, type) {
       console.log(collapsed, type)
+    },
+    handleMenuClick (e) {
+      console.log(e)
+      this.selectedFolder = this.folders.filter(f => String(f.fid) === e.key)[0]
+    },
+    onSelected (item) {
+      if (item) {
+        this.selectedArticle = item
+      }
     }
   },
   computed: {

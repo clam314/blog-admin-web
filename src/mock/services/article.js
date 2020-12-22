@@ -99,39 +99,60 @@ const article = (options) => {
 
 const articles = (options) => {
   const queryParameters = getQueryParameters(options)
-  console.log('queryParameters', queryParameters)
+
   if (queryParameters && !queryParameters.count) {
-    queryParameters.count = 5
+    queryParameters.count = 10
   }
   const data = []
   for (let i = 0; i < queryParameters.count; i++) {
-    const tmpKey = i + 1
     data.push({
-      tid: tmpKey,
-      uid: tmpKey,
-      did: tmpKey,
-      title: titles[i % 8],
-      description: descList[i % 5],
+      tid: Mock.mock('@id'),
+      uid: Mock.mock('@id'),
+      fid: Mock.mock('@id'),
+      title: Mock.mock('@title'),
+      description: Mock.mock('@cparagraph()'),
       des_image: null,
-      content: 'https://github.com/clam314/clam314/blob/main/README.md',
+      content: Mock.mock('@paragraph()'),
       file_type: 'md',
       created: Mock.mock('@datetime'),
       updated: Mock.mock('@datetime'),
-      catalog: Mock.mock('@string(8)'),
       published: Mock.mock('@integer(0, 1)'),
-      role: [],
+      role: Mock.mock('@integer(1, 99)'),
       reads: Mock.mock('@integer(1, 999)'),
+      like: Mock.mock('@integer(1, 999)'),
       comments: Mock.mock('@integer(1, 999)'),
-      status: Mock.mock('@integer(0, 1)'),
+      converse: Mock.mock('@integer(0, 1)'),
       isTop: Mock.mock('@integer(0, 1)'),
-      sort: Mock.mock('@integer(0, 1)'),
+      sort: Mock.mock('@integer(0, 3)'),
       tags: Mock.mock({ 'array|1-6': ['Hello', 'Mock.js', '!'] })
     })
   }
-  console.log('articallist', data)
+  console.log('articles', data)
+  return builder(data)
+}
+
+const folders = (options) => {
+  const queryParameters = getQueryParameters(options)
+  console.log('queryParameters', queryParameters)
+  if (queryParameters && !queryParameters.count) {
+    queryParameters.count = 10
+  }
+  const data = []
+  for (let i = 0; i < queryParameters.count; i++) {
+    data.push({
+      uid: Mock.mock('@id'),
+      fid: Mock.mock('@id'),
+      name: Mock.mock('@word()'),
+      created: Mock.mock('@datetime'),
+      updated: Mock.mock('@datetime'),
+      status: Mock.mock('@integer(0, 1)')
+    })
+  }
+  console.log('folders', data)
   return builder(data)
 }
 
 // Mock.mock(/\/list\/article/, 'get', article)
-// Mock.mock(/\/list\/articleMenuList/, 'get', articleList)
-Mock.mock(/\/list\/articleMenus/, 'get', articles)
+
+Mock.mock(/\/list\/articles/, 'get', articles)
+Mock.mock(/\/list\/folders/, 'get', folders)

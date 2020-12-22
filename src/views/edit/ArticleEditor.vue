@@ -25,18 +25,7 @@
         :previewBackground="markdown.previewBackground"
       />
     </a-layout-content>
-    <a-drawer
-      title="Basic Drawer"
-      width="350"
-      :placement="placement"
-      :closable="false"
-      :visible="infoDrawer.visible"
-      @close="closeInfoDrawer"
-    >
-      <p>Some contents...</p>
-      <p>Some contents...</p>
-      <p>Some contents...</p>
-    </a-drawer>
+    <article-status-drawer ref="aStatus"/>
   </a-layout>
 </template>
 
@@ -44,18 +33,22 @@
 import { uploadImg } from '@/api/articleImg'
 import { getMarkdownArticle, saveMarkdownArticle } from '@/api/article'
 import defaultSettings from '@/config/defaultSettings'
+import ArticleStatusDrawer from '@/views/edit/ArticleStatusDrawer'
 
 const defaultTitle = '请输入标题...'
 export default {
-  name: 'ArticleEditor',
+  components: {
+    ArticleStatusDrawer
+  },
   props: {
-    markdownFile: {
+    article: {
      type: Object,
      default: null
     }
   },
   data () {
     return {
+      local: true, // true-文档来源是本地，false-来源网络需要请求
       markdown: {
         codeStyle: 'atom-one-dark',
         editorBackground: '#fafafa',
@@ -114,13 +107,25 @@ export default {
     }
   },
   created () {
-    this.getArticle()
+    if (!this.local) {
+      this.getArticle()
+    }
   },
   mounted () {
     this.timer = setInterval(this.intervalSave, 2 * 60 * 1000)
   },
   beforeDestroy () {
     clearInterval(this.timer)
+  },
+  watch: {
+    article (val) {
+      if (val) {
+        const { tid, title, content } = val
+        this.markdownForm.articleId = tid
+        this.markdownForm.title = title
+        this.markdownForm.contentMarkdown = content
+      }
+    }
   },
   methods: {
     getArticle () { // 获取文章内容
@@ -181,7 +186,7 @@ export default {
       }
     },
     openInfoDrawer () {
-      this.infoDrawer.visible = true
+      this.$refs.aStatus.openInfoDrawer()
     }
   }
 }
