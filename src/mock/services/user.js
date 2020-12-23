@@ -1,5 +1,5 @@
 import Mock from 'mockjs2'
-import { builder } from '../util'
+import { builder, getBody, getPublicHead } from '../util'
 
 const info = (options) => {
   console.log('options', options)
@@ -767,6 +767,19 @@ const userTags = (options) => {
   ])
 }
 
+const initial = (options) => {
+  const body = getBody(options)
+  console.log('mock: body', body)
+  const head = getPublicHead(body.head.requestId)
+  return {
+    head,
+    data: {
+      appSecret: 'qrj3qFJIo2fj214FJNAji241'
+    }
+  }
+}
+
+Mock.mock(/\/api\/user\/initial/, initial)
 Mock.mock(/\/api\/user\/info/, 'get', info)
 Mock.mock(/\/api\/user\/nav/, 'get', userNav)
 Mock.mock(/\/api\/user\/tags/, 'get', userTags)

@@ -5,6 +5,29 @@ const responseBody = {
   code: 0
 }
 
+export const getPublicHead = (requestId, message, code) => {
+  return {
+    requestId,
+    respCode: code,
+    respMsg: message,
+    timestamp: new Date().getTime()
+  }
+}
+
+export const builderV2 = (data, message = 'OK', code = 200, headers = {}, requestId) => {
+  const resp = {
+    data,
+    head: getPublicHead(requestId, message, code)
+  }
+  if (code !== undefined && code !== 200) {
+    resp._status = code
+  }
+  if (headers !== null && typeof headers === 'object' && Object.keys(headers).length > 0) {
+    resp._headers = headers
+  }
+  return resp
+}
+
 export const builder = (data, message, code = 0, headers = {}) => {
   responseBody.result = data
   if (message !== undefined && message !== null) {

@@ -1,10 +1,11 @@
 import storage from 'store'
-import { login, getInfo, logout } from '@/api/login'
-import { ACCESS_TOKEN } from '@/store/mutation-types'
+import { initial, login, getInfo, logout } from '@/api/login'
+import { ACCESS_TOKEN, APP_SECRET } from '@/store/mutation-types'
 import { welcome } from '@/utils/util'
 
 const user = {
   state: {
+    appSecret: '',
     token: '',
     name: '',
     welcome: '',
@@ -14,6 +15,9 @@ const user = {
   },
 
   mutations: {
+    SET_APP_SECRET: (state, secret) => {
+      state.appSecret = secret
+    },
     SET_TOKEN: (state, token) => {
       state.token = token
     },
@@ -33,6 +37,17 @@ const user = {
   },
 
   actions: {
+    // 初始化
+    Initial ({ commit }) {
+      return new Promise((resolve, reject) => {
+        initial().then(response => {
+          const { appSecret } = response
+          storage.set(APP_SECRET, appSecret, 7 * 24 * 60 * 60 * 1000)
+          commit('SET_APP_SECRET', appSecret)
+        })
+      })
+    },
+
     // 登录
     Login ({ commit }, userInfo) {
       return new Promise((resolve, reject) => {

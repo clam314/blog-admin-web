@@ -1,6 +1,7 @@
 import request from '@/utils/request'
 
 const userApi = {
+  Initial: '/user/initial',
   Login: '/auth/login',
   Logout: '/auth/logout',
   ForgePassword: '/auth/forge-password',
@@ -11,6 +12,17 @@ const userApi = {
   // get my info
   UserInfo: '/user/info',
   UserMenu: '/user/nav'
+}
+
+/**
+ * 初始化获取appSecret等初始化信息
+ * @returns {AxiosPromise}
+ */
+export function initial () {
+  return request({
+    url: userApi.Initial,
+    method: 'post'
+  })
 }
 
 /**

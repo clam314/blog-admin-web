@@ -57,6 +57,7 @@
 <script>
 import ArticleMenuList from '@/views/edit/ArticleMenuList'
 import ArticleEditor from '@/views/edit/ArticleEditor'
+import { getFolders } from '@/api/article'
 
 export default {
   components: {
@@ -85,7 +86,7 @@ export default {
   },
   methods: {
     getDate (callback) {
-      this.$http.get('/list/folders').then(res => {
+      getFolders().then(res => {
         console.log(res)
         callback(res)
       })

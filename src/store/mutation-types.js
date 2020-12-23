@@ -1,3 +1,4 @@
+export const APP_SECRET = 'App_Secret'
 export const ACCESS_TOKEN = 'Access-Token'
 
 export const SIDEBAR_TYPE = 'sidebar_type'

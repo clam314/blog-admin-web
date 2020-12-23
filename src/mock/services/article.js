@@ -1,6 +1,5 @@
 import Mock from 'mockjs2'
-import { builder, getQueryParameters } from '../util'
-// import options from 'vue-quill-editor/src/options'
+import { builder, getBody, getQueryParameters } from '../util'
 
 const titles = [
   'Alipay',
@@ -98,13 +97,17 @@ const article = (options) => {
 }
 
 const articles = (options) => {
-  const queryParameters = getQueryParameters(options)
-
-  if (queryParameters && !queryParameters.count) {
-    queryParameters.count = 10
+  const body = getBody(options)
+  console.log('mock: body', body)
+  let { pageNum, pageCount } = body
+  if (!pageNum) {
+    pageNum = 1
+  }
+  if (!pageCount) {
+    pageCount = 20
   }
   const data = []
-  for (let i = 0; i < queryParameters.count; i++) {
+  for (let i = 0; i < pageCount; i++) {
     data.push({
       tid: Mock.mock('@id'),
       uid: Mock.mock('@id'),
@@ -127,18 +130,28 @@ const articles = (options) => {
       tags: Mock.mock({ 'array|1-6': ['Hello', 'Mock.js', '!'] })
     })
   }
-  console.log('articles', data)
-  return builder(data)
+  const result = {
+    head: {
+      'requestId': '123456789123',
+      'token': '',
+      'sign': 'xxxxxxxx'
+    },
+    data: {
+      pageNum: pageNum + 1,
+      pageCount: pageCount,
+      articles: data
+    }
+  }
+  console.log('articles', result)
+  return builder(result)
 }
 
 const folders = (options) => {
-  const queryParameters = getQueryParameters(options)
-  console.log('queryParameters', queryParameters)
-  if (queryParameters && !queryParameters.count) {
-    queryParameters.count = 10
-  }
+  const body = getBody(options)
+  console.log('mock: body', body)
+  const count = Mock.mock('@integer(0, 20)')
   const data = []
-  for (let i = 0; i < queryParameters.count; i++) {
+  for (let i = 0; i < count; i++) {
     data.push({
       uid: Mock.mock('@id'),
       fid: Mock.mock('@id'),
@@ -154,5 +167,5 @@ const folders = (options) => {
 
 // Mock.mock(/\/list\/article/, 'get', article)
 
-Mock.mock(/\/list\/articles/, 'get', articles)
-Mock.mock(/\/list\/folders/, 'get', folders)
+Mock.mock(/\/list\/articles/, 'post', articles)
+Mock.mock(/\/list\/folders/, 'post', folders)
