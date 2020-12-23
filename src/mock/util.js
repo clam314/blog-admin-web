@@ -14,9 +14,9 @@ export const getPublicHead = (requestId, message, code) => {
   }
 }
 
-export const builderV2 = (data, message = 'OK', code = 200, headers = {}, requestId) => {
+export const builderV2 = (result, requestId = 'requestId', message = 'OK', code = 200, headers = {}) => {
   const resp = {
-    data,
+    result,
     head: getPublicHead(requestId, message, code)
   }
   if (code !== undefined && code !== 200) {

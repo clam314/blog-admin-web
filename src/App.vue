@@ -9,8 +9,12 @@
 <script>
 import { domTitle, setDocumentTitle } from '@/utils/domUtil'
 import { i18nRender } from '@/locales'
+import { mapActions } from 'vuex'
 
 export default {
+  beforeMount () {
+    this.Initial() // 获取初始化信息
+  },
   data () {
     return {
     }
@@ -23,6 +27,9 @@ export default {
 
       return this.$i18n.getLocaleMessage(this.$store.getters.lang).antLocale
     }
+  },
+  methods: {
+    ...mapActions(['Initial'])
   }
 }
 </script>

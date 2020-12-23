@@ -41,7 +41,7 @@ const user = {
     Initial ({ commit }) {
       return new Promise((resolve, reject) => {
         initial().then(response => {
-          const { appSecret } = response
+          const { result: { appSecret } } = response
           storage.set(APP_SECRET, appSecret, 7 * 24 * 60 * 60 * 1000)
           commit('SET_APP_SECRET', appSecret)
         })
