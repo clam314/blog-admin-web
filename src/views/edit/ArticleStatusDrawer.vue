@@ -27,7 +27,7 @@
       :label-col="labelCol"
       :wrapper-col="wrapperCol"
     >
-      <a-form-model-item label="Activity zone" prop="region">
+      <a-form-model-item label="文件夹" prop="region">
         <a-select v-model="form.region" placeholder="please select your zone">
           <a-select-option value="shanghai">
             Zone one
@@ -37,53 +37,59 @@
           </a-select-option>
         </a-select>
       </a-form-model-item>
-      <a-form-model-item label="Activity time" required prop="date1">
-        <a-date-picker
-          v-model="form.date1"
-          show-time
-          type="date"
-          placeholder="Pick a date"
-          style="width: 100%;"
-        />
-      </a-form-model-item>
-      <a-form-model-item label="Instant delivery" prop="delivery">
+      <a-form-model-item label="发布" prop="delivery">
         <a-switch v-model="form.delivery" />
       </a-form-model-item>
-      <a-form-model-item label="Activity type" prop="type">
+      <a-form-model-item label="状态" prop="type">
         <a-checkbox-group v-model="form.type">
           <a-checkbox value="1" name="type">
-            Online
+            私密
           </a-checkbox>
           <a-checkbox value="2" name="type">
-            Promotion
+            置顶
           </a-checkbox>
           <a-checkbox value="3" name="type">
-            Offline
+            关闭评论
           </a-checkbox>
         </a-checkbox-group>
       </a-form-model-item>
-      <a-form-model-item label="Resources" prop="resource">
-        <a-radio-group v-model="form.resource">
-          <a-radio value="1">
-            Sponsor
-          </a-radio>
-          <a-radio value="2">
-            Venue
-          </a-radio>
-        </a-radio-group>
-      </a-form-model-item>
-      <a-form-model-item label="Activity form" prop="desc" :labelCol="{span:4, offset: 0 }" :wrapper-col="{ span: 12, offset: 1 }">
+      <a-form-model-item label="简介" prop="desc">
         <a-input v-model="form.desc" type="textarea" />
       </a-form-model-item>
-      <a-form-model-item :wrapper-col="{ span: 14, offset: 4 }">
-        <a-button type="primary" @click="onSubmit">
-          Create
-        </a-button>
-        <a-button style="margin-left: 10px;" @click="resetForm">
-          Reset
+      <a-form-model-item :wrapper-col="{ span: 20, offset: 2 }">
+        <a-button type="primary" @click="onSubmit" style="width: 100%">
+          提交修改
         </a-button>
       </a-form-model-item>
     </a-form-model>
+
+    <!-- 统计信息项 -->
+    <a-divider orientation="left">
+      统计
+    </a-divider>
+    <a-row >
+      <a-col :span="4" :offset="3">
+        <a-statistic title="阅读数" :value="0">
+          <template #suffix>
+            <a-icon type="eye" />
+          </template>
+        </a-statistic>
+      </a-col>
+      <a-col :span="4" :offset="3">
+        <a-statistic title="点赞数" :value="0" >
+          <template #suffix>
+            <a-icon type="like" />
+          </template>
+        </a-statistic>
+      </a-col>
+      <a-col :span="4" :offset="3">
+        <a-statistic title="评论数" :value="0" >
+          <template #suffix>
+            <a-icon type="sound"/>
+          </template>
+        </a-statistic>
+      </a-col>
+    </a-row>
   </a-drawer>
 </template>
 <script>
@@ -108,8 +114,8 @@ export default {
     return {
       drawerVisible: true,
       statusTop: this.article ? this.article.sort : 0, // 0-不置顶，1-3越大优先级越高,
-      labelCol: { span: 4 },
-      wrapperCol: { span: 19 },
+      labelCol: { span: 4, offset: 0 },
+      wrapperCol: { span: 18, offset: 1 },
       other: '',
       form: {
         folder: '',
@@ -125,12 +131,11 @@ export default {
           { required: true, message: 'Please input Activity name', trigger: 'blur' },
           { min: 3, max: 5, message: 'Length should be 3 to 5', trigger: 'blur' }
         ],
-        region: [{ required: true, message: 'Please select Activity zone', trigger: 'change' }],
+        region: [{ required: false, message: 'Please select Activity zone', trigger: 'change' }],
         date1: [{ required: true, message: 'Please pick a date', trigger: 'change' }],
         type: [
           {
             type: 'array',
-            required: true,
             message: 'Please select at least one activity type',
             trigger: 'change'
           }
@@ -138,7 +143,7 @@ export default {
         resource: [
           { required: true, message: 'Please select activity resource', trigger: 'change' }
         ],
-        desc: [{ required: true, message: 'Please input activity form', trigger: 'blur' }]
+        desc: [{ required: false, message: 'Please input activity form', trigger: 'blur' }]
       }
     }
   },
