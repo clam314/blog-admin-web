@@ -152,7 +152,7 @@ export default {
   },
   data () {
     return {
-      drawerVisible: true,
+      drawerVisible: false,
       preparingForm: true,
       preparingStatistics: true,
 

@@ -112,10 +112,10 @@ const articles = (options) => {
       tid: Mock.mock('@id'),
       uid: Mock.mock('@id'),
       fid: Mock.mock('@id'),
-      title: Mock.mock('@title'),
-      description: Mock.mock('@cparagraph()'),
+      title: Mock.mock('@cword(3,10)'),
+      description: Mock.mock('@csentence(200)'),
       des_image: null,
-      content: Mock.mock('@paragraph()'),
+      content: Mock.mock('@cparagraph(0,100)'),
       file_type: 'md',
       created: Mock.mock('@datetime'),
       updated: Mock.mock('@datetime'),
@@ -148,7 +148,7 @@ const folders = (options) => {
     data.push({
       uid: Mock.mock('@id'),
       fid: Mock.mock('@id'),
-      name: Mock.mock('@word()'),
+      name: Mock.mock('@cword(3,10)'),
       created: Mock.mock('@datetime'),
       updated: Mock.mock('@datetime'),
       status: Mock.mock('@integer(0, 1)')
