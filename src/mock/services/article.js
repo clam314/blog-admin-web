@@ -120,6 +120,7 @@ const articles = (options) => {
       created: Mock.mock('@datetime'),
       updated: Mock.mock('@datetime'),
       published: Mock.mock('@integer(0, 1)'),
+      private: Mock.mock('@integer(0, 1)'),
       role: Mock.mock('@integer(1, 99)'),
       reads: Mock.mock('@integer(1, 999)'),
       like: Mock.mock('@integer(1, 999)'),

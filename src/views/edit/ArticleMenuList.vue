@@ -22,7 +22,7 @@
             <a slot="title" class="list-title" :class="!collapsed? 'list-title-normal' : 'list-title-collapsed'">{{ item.title }}</a>
             <a-badge slot="avatar">
               <a-icon slot="count" class="icon-color" type="check" v-if="item.published"/>
-              <a-avatar class="list-icon icon-color" :icon="fileIcon(item.content)" />
+              <a-avatar class="list-icon icon-color" :icon="fileIcon('md')" />
             </a-badge>
             <div slot="description" class="list-description" :class="!collapsed? 'list-description-normal' : 'list-description-collapsed'">
               {{ item.description }}
@@ -75,7 +75,6 @@ export default {
   watch: {
     folder (val) {
       if (val) {
-        console.log(val)
         this.busy = true
         this.loading = true
         this.data = []
@@ -123,13 +122,6 @@ export default {
     },
     fileIcon (filePath) {
       return getFileTypeForIcon(filePath)
-    },
-    ellipsis (str, limit) {
-      if (str.length > limit) {
-        return str.slice(0, limit) + '……'
-      } else {
-        return str
-      }
     }
   }
 }

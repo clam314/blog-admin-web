@@ -27,10 +27,10 @@
         :label-col="labelCol"
         :wrapper-col="wrapperCol"
       >
-        <a-form-model-item label="文件夹" prop="folder">
-          <a-select v-model="form.folder" placeholder="请选择所属文件夹">
+        <a-form-model-item label="文件夹" prop="folderId">
+          <a-select v-model="form.folderId" placeholder="请选择所属文件夹">
             <template v-for="folder in folders">
-              <a-select-option :value="folder" :key="folder.fid">
+              <a-select-option :key="folder.fid">
                 {{ folder.name }}
               </a-select-option>
             </template>
@@ -40,14 +40,14 @@
           <a-switch v-model="form.publish" />
         </a-form-model-item>
         <a-form-model-item label="状态" prop="status">
-          <a-checkbox-group v-model="form.status" :value="form.status">
-            <a-checkbox value="1" name="status">
+          <a-checkbox-group v-model="form.status" >
+            <a-checkbox :value="statusKeys[0]">
               私密
             </a-checkbox>
-            <a-checkbox value="2" name="status">
+            <a-checkbox :value="statusKeys[1]">
               置顶
             </a-checkbox>
-            <a-checkbox value="3" name="status">
+            <a-checkbox :value="statusKeys[2]">
               关闭评论
             </a-checkbox>
           </a-checkbox-group>
@@ -159,14 +159,16 @@ export default {
       labelCol: { span: 4, offset: 0 },
       wrapperCol: { span: 18, offset: 1 },
 
+      statusKeys: ['private', 'isTop', 'converse'],
+
       form: {
-        folder: '',
+        folderId: '',
         publish: false,
-        status: [1, 2, 3],
+        status: ['private'],
         desc: ''
       },
       rules: {
-        folder: [{ required: false, message: 'Please select Activity zone', trigger: 'change' }],
+        folder: [{ required: true, message: 'Please select Activity zone', trigger: 'change' }],
         status: [
           {
             type: 'array',
@@ -174,7 +176,7 @@ export default {
             trigger: 'change'
           }
         ],
-        desc: [{ required: false, message: 'Please input activity form', trigger: 'blur' }]
+        desc: [{ max: 200, message: '简单描述文章内容，请输入200字以内。', trigger: 'blur' }]
       },
 
       tags: [],
@@ -184,25 +186,23 @@ export default {
       tagInputValue: ''
     }
   },
-  computed: {
-    defaultFolder () {
-      for (const folder in this.folders) {
-        if (folder.fid === this.article.fid) {
-          return folder
-        }
-      }
-      return ''
-    }
-  },
   mounted () {
     this.getTags()
   },
   watch: {
     article (newVal) {
-      if (newVal) this.preparingStatistics = true
+      if (newVal) {
+        this.preparingStatistics = false
+        this.form.status = [];
+        [0, 1, 2].forEach(i => {
+          if (newVal[this.statusKeys[i]]) {
+            this.form.status.push(this.statusKeys[i])
+          }
+        })
+      }
       this.initData()
     },
-    folders (newVal) {
+    folders () {
       this.initData()
     }
   },
@@ -211,15 +211,12 @@ export default {
       if (!this.article || !this.folders) {
         return
       }
-      this.preparingStatistics = true
+      // TODO 测试将文件夹id和文章id强行关联，接后台时需要删除
+      this.folders[5].fid = this.article.fid
+      this.preparingForm = false
       this.form.publish = Boolean(this.article.published)
       this.form.desc = this.article.description || ''
-      for (const folder in this.folders) {
-        if (folder.fid === this.article.fid) {
-          this.form.folder = folder
-          break
-        }
-      }
+      this.form.folderId = this.article.fid
     },
     closeInfoDrawer () {
       this.drawerVisible = false
