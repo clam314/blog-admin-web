@@ -39,17 +39,17 @@
         class="article-list-wrapper"
         :style="[{maxWidth : articleListWidth + 'px'},{minWidth : articleListWidth + 'px'},{backgroundColor:'white'},{width : articleListWidth + 'px'}]"
         @collapse="handleCollapsed"
-        v-model="collapsed"
+        v-model="collapsedArticleList"
       >
         <div class="article-list-wrapper-btn">
           <a-icon type="file-add" style="font-size: 16px;"/>
-          <span :class="!collapsed ? 'article-list-wrapper-text':'article-list-wrapper-text-collapsed'">新建文档</span>
+          <span :class="!collapsedArticleList ? 'article-list-wrapper-text':'article-list-wrapper-text-collapsed'">新建文档</span>
         </div>
-        <article-menu-list :collapsed="collapsed" :folder="selectedFolder" @changeSelect="onSelected"/>
+        <article-menu-list :collapsed="collapsedArticleList" :folder="selectedFolder" @changeSelect="onSelected"/>
       </a-layout-sider>
 
       <a-layout-content style="margin: 0 0; width: 100% ;height: 100%;max-height: 100%">
-        <article-editor class="article-editor" :article="selectedArticle"/>
+        <article-editor class="article-editor" :article="selectedArticle" :folders="folders"/>
       </a-layout-content>
     </a-layout>
   </a-layout>
@@ -69,6 +69,7 @@ export default {
     return {
       loading: false,
       collapsed: false,
+      collapsedArticleList: false,
       addBtnTitle: '新建文件',
       selectedKeys: [],
       mdValue: '',
@@ -108,7 +109,16 @@ export default {
   },
   computed: {
     articleListWidth () {
-      return this.collapsed ? 120 : 300
+      return this.collapsedArticleList ? 120 : 300
+    }
+  },
+  watch: {
+    collapsed (newVal, oldVal) {
+      if (newVal !== oldVal) {
+        setTimeout(() => {
+          this.collapsedArticleList = this.collapsed
+        }, 300)
+      }
     }
   }
 }

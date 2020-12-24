@@ -19,76 +19,78 @@
     <a-divider orientation="left">
       状态
     </a-divider>
-    <a-form-model
-      ref="ruleForm"
-      :model="form"
-      :rules="rules"
-      :label-col="labelCol"
-      :wrapper-col="wrapperCol"
-    >
-      <a-form-model-item label="文件夹" prop="region">
-        <a-select v-model="form.region" placeholder="please select your zone">
-          <a-select-option value="shanghai">
-            Zone one
-          </a-select-option>
-          <a-select-option value="beijing">
-            Zone two
-          </a-select-option>
-        </a-select>
-      </a-form-model-item>
-      <a-form-model-item label="发布" prop="delivery">
-        <a-switch v-model="form.delivery" />
-      </a-form-model-item>
-      <a-form-model-item label="状态" prop="type">
-        <a-checkbox-group v-model="form.type">
-          <a-checkbox value="1" name="type">
-            私密
-          </a-checkbox>
-          <a-checkbox value="2" name="type">
-            置顶
-          </a-checkbox>
-          <a-checkbox value="3" name="type">
-            关闭评论
-          </a-checkbox>
-        </a-checkbox-group>
-      </a-form-model-item>
-      <a-form-model-item label="简介" prop="desc">
-        <a-input v-model="form.desc" type="textarea" />
-      </a-form-model-item>
-      <a-form-model-item :wrapper-col="{ span: 20, offset: 2 }">
-        <a-button type="primary" @click="onSubmit" style="width: 100%">
-          提交修改
-        </a-button>
-      </a-form-model-item>
-    </a-form-model>
-
+    <a-spin :spinning="preparingForm" >
+      <a-form-model
+        ref="ruleForm"
+        :model="form"
+        :rules="rules"
+        :label-col="labelCol"
+        :wrapper-col="wrapperCol"
+      >
+        <a-form-model-item label="文件夹" prop="folder">
+          <a-select v-model="form.folder" placeholder="请选择所属文件夹">
+            <template v-for="folder in folders">
+              <a-select-option :value="folder" :key="folder.fid">
+                {{ folder.name }}
+              </a-select-option>
+            </template>
+          </a-select>
+        </a-form-model-item>
+        <a-form-model-item label="发布" prop="publish">
+          <a-switch v-model="form.publish" />
+        </a-form-model-item>
+        <a-form-model-item label="状态" prop="status">
+          <a-checkbox-group v-model="form.status" :value="form.status">
+            <a-checkbox value="1" name="status">
+              私密
+            </a-checkbox>
+            <a-checkbox value="2" name="status">
+              置顶
+            </a-checkbox>
+            <a-checkbox value="3" name="status">
+              关闭评论
+            </a-checkbox>
+          </a-checkbox-group>
+        </a-form-model-item>
+        <a-form-model-item label="简介" prop="desc">
+          <a-input v-model="form.desc" type="textarea" />
+        </a-form-model-item>
+        <a-form-model-item :wrapper-col="{ span: 22, offset: 1 }">
+          <a-button type="primary" @click="onSubmit" style="width: 100%">
+            提交修改
+          </a-button>
+        </a-form-model-item>
+      </a-form-model>
+    </a-spin>
     <!-- 统计信息项 -->
     <a-divider orientation="left">
       统计
     </a-divider>
-    <a-row >
-      <a-col :span="4" :offset="3">
-        <a-statistic title="阅读数" :value="0">
-          <template #suffix>
-            <a-icon type="eye" />
-          </template>
-        </a-statistic>
-      </a-col>
-      <a-col :span="4" :offset="3">
-        <a-statistic title="点赞数" :value="0" >
-          <template #suffix>
-            <a-icon type="like" />
-          </template>
-        </a-statistic>
-      </a-col>
-      <a-col :span="4" :offset="3">
-        <a-statistic title="评论数" :value="0" >
-          <template #suffix>
-            <a-icon type="sound"/>
-          </template>
-        </a-statistic>
-      </a-col>
-    </a-row>
+    <a-spin :spinning="preparingStatistics" >
+      <a-row type="flex" justify="center">
+        <a-col :span="6" :offset="1">
+          <a-statistic title="阅读数" :value="article ? article.reads : 0">
+            <template #suffix>
+              <a-icon type="eye" />
+            </template>
+          </a-statistic>
+        </a-col>
+        <a-col :span="6" :offset="1">
+          <a-statistic title="点赞数" :value="article ? article.like : 0" >
+            <template #suffix>
+              <a-icon type="like" />
+            </template>
+          </a-statistic>
+        </a-col>
+        <a-col :span="6" :offset="1">
+          <a-statistic title="评论数" :value="article ? article.comments : 0" >
+            <template #suffix>
+              <a-icon type="sound"/>
+            </template>
+          </a-statistic>
+        </a-col>
+      </a-row>
+    </a-spin>
 
     <a-divider orientation="left">
       标签
@@ -133,9 +135,11 @@
 <script>
 import Vue from 'vue'
 import { FormModel } from 'ant-design-vue'
+import TagSelectOption from '@/components/TagSelect/TagSelectOption'
 Vue.use(FormModel)
 
 export default {
+  components: { TagSelectOption },
   props: {
     article: {
       type: Object,
@@ -143,43 +147,32 @@ export default {
     },
     folders: {
       type: Array,
-      default: () => {
-        return []
-      }
+      default: null
     }
   },
   data () {
     return {
       drawerVisible: true,
+      preparingForm: true,
+      preparingStatistics: true,
 
       labelCol: { span: 4, offset: 0 },
       wrapperCol: { span: 18, offset: 1 },
-      other: '',
+
       form: {
         folder: '',
-        sort: undefined,
-        date1: undefined,
-        delivery: false,
-        type: [],
-        resource: '',
+        publish: false,
+        status: [1, 2, 3],
         desc: ''
       },
       rules: {
-        name: [
-          { required: true, message: 'Please input Activity name', trigger: 'blur' },
-          { min: 3, max: 5, message: 'Length should be 3 to 5', trigger: 'blur' }
-        ],
-        region: [{ required: false, message: 'Please select Activity zone', trigger: 'change' }],
-        date1: [{ required: true, message: 'Please pick a date', trigger: 'change' }],
-        type: [
+        folder: [{ required: false, message: 'Please select Activity zone', trigger: 'change' }],
+        status: [
           {
             type: 'array',
             message: 'Please select at least one activity type',
             trigger: 'change'
           }
-        ],
-        resource: [
-          { required: true, message: 'Please select activity resource', trigger: 'change' }
         ],
         desc: [{ required: false, message: 'Please input activity form', trigger: 'blur' }]
       },
@@ -204,7 +197,30 @@ export default {
   mounted () {
     this.getTags()
   },
+  watch: {
+    article (newVal) {
+      if (newVal) this.preparingStatistics = true
+      this.initData()
+    },
+    folders (newVal) {
+      this.initData()
+    }
+  },
   methods: {
+    initData () {
+      if (!this.article || !this.folders) {
+        return
+      }
+      this.preparingStatistics = true
+      this.form.publish = Boolean(this.article.published)
+      this.form.desc = this.article.description || ''
+      for (const folder in this.folders) {
+        if (folder.fid === this.article.fid) {
+          this.form.folder = folder
+          break
+        }
+      }
+    },
     closeInfoDrawer () {
       this.drawerVisible = false
     },

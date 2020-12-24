@@ -5,8 +5,8 @@
         class="editor-title"
         v-model="markdownForm.title"
         size="large">
-        <a-icon slot="addonAfter" type="setting" @click="openInfoDrawer"/>
         <a-icon slot="addonAfter" type="delete" @click="deleteArticle" />
+        <a-icon slot="addonAfter" type="menu-unfold" @click="openInfoDrawer"/>
       </a-input>
     </a-layout-header>
     <a-layout-content>
@@ -25,7 +25,7 @@
         :previewBackground="markdown.previewBackground"
       />
     </a-layout-content>
-    <article-status-drawer ref="aStatus"/>
+    <article-status-drawer ref="aStatus" :article="article" :folders="folders"/>
   </a-layout>
 </template>
 
@@ -44,6 +44,10 @@ export default {
     article: {
      type: Object,
      default: null
+    },
+    folders: {
+      type: Array,
+      default: null
     }
   },
   data () {

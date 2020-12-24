@@ -20,20 +20,18 @@
         <div class="list-item-content" >
           <a-list-item-meta>
             <a slot="title" class="list-title" :class="!collapsed? 'list-title-normal' : 'list-title-collapsed'">{{ item.title }}</a>
-            <a-avatar
-              class="list-icon"
-              slot="avatar"
-              shape="square"
-              :icon="fileIcon(item.content)"
-            />
+            <a-badge slot="avatar">
+              <a-icon slot="count" class="icon-color" type="check" v-if="item.published"/>
+              <a-avatar class="list-icon icon-color" :icon="fileIcon(item.content)" />
+            </a-badge>
             <div slot="description" class="list-description" :class="!collapsed? 'list-description-normal' : 'list-description-collapsed'">
               {{ item.description }}
             </div>
           </a-list-item-meta>
         </div>
       </a-list-item>
-      <div v-if="true" class="loading-container">
-        <a-spin />
+      <div v-if="loading" class="loading-container">
+        <a-spin style="margin-top: 10px"/>
       </div>
     </a-list>
   </div>
@@ -73,21 +71,13 @@ export default {
   beforeMount () {
     this.busy = true
     this.loading = true
-    // this.getData(res => {
-    //   this.loading = false
-    //   this.busy = false
-    //   if (res.result) {
-    //     this.data = res.result
-    //     this.onSelectChange(this.data[0])
-    //   }
-    // })
   },
   watch: {
     folder (val) {
       if (val) {
         console.log(val)
-        this.loading = false
-        this.busy = false
+        this.busy = true
+        this.loading = true
         this.data = []
         this.getData(res => {
           this.loading = false
@@ -177,6 +167,10 @@ export default {
       transition: transform .3s @ease-in-out,opacity .3s @ease-in-out,-webkit-transform .3s @ease-in-out;
     }
 
+    .icon-color{
+      color: @primary-color;
+    }
+
     &-content{
       padding: 0 @wrapper-padding;
     }
@@ -234,10 +228,6 @@ export default {
     opacity: 0;
     height: 0;
     transition: opacity 0.3s @ease-in-out, height 0.3s @ease-in-out;
-  }
-
-  .list-icon {
-    background-color: @primary-color;
   }
 
   .list-item-selected{
