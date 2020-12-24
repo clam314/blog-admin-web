@@ -1,5 +1,5 @@
 import Mock from 'mockjs2'
-import { builder, getBody, getQueryParameters } from '../util'
+import { builder, builderV2, getBody, getQueryParameters } from '../util'
 
 const titles = [
   'Alipay',
@@ -131,25 +131,17 @@ const articles = (options) => {
     })
   }
   const result = {
-    head: {
-      'requestId': '123456789123',
-      'token': '',
-      'sign': 'xxxxxxxx'
-    },
-    data: {
       pageNum: pageNum + 1,
       pageCount: pageCount,
-      articles: data
-    }
+      list: data
   }
-  console.log('articles', result)
-  return builder(result)
+  return builderV2(result, body.head.requestId)
 }
 
 const folders = (options) => {
   const body = getBody(options)
   console.log('mock: body', body)
-  const count = Mock.mock('@integer(0, 20)')
+  const count = Mock.mock('@integer(0, 50)')
   const data = []
   for (let i = 0; i < count; i++) {
     data.push({
@@ -162,7 +154,7 @@ const folders = (options) => {
     })
   }
   console.log('folders', data)
-  return builder(data)
+  return builderV2(data, body.head.requestId)
 }
 
 // Mock.mock(/\/list\/article/, 'get', article)

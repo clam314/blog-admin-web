@@ -17,9 +17,8 @@
 
     <!-- 状态设置项 -->
     <a-divider orientation="left">
-      状态设置
+      状态
     </a-divider>
-
     <a-form-model
       ref="ruleForm"
       :model="form"
@@ -90,6 +89,45 @@
         </a-statistic>
       </a-col>
     </a-row>
+
+    <a-divider orientation="left">
+      标签
+    </a-divider>
+    <div class="account-center-tags" style="padding: 0 10px">
+      <a-spin :spinning="tagsSpinning" >
+        <template v-for="tag in tags" >
+          <a-tooltip v-if="tag.length > 20" :key="tag" :title="tag">
+            <a-tag
+              style="margin-bottom: 10px"
+              :key="tag"
+              :closable="true"
+              :close="() => handleTagClose(tag)"
+            >{{ `${tag.slice(0, 20)}...` }}</a-tag>
+          </a-tooltip>
+          <a-tag
+            v-else
+            style="margin-bottom: 10px"
+            :key="tag"
+            :closable="true"
+            :close="() => handleTagClose(tag)"
+          >{{ tag }}</a-tag>
+        </template>
+        <a-input
+          v-if="tagInputVisible"
+          ref="tagInput"
+          type="text"
+          size="small"
+          :style="{ width: '78px' }"
+          :value="tagInputValue"
+          @change="handleInputChange"
+          @blur="handleTagInputConfirm"
+          @keyup.enter="handleTagInputConfirm"
+        />
+        <a-tag v-else @click="showTagInput" style="background: #fff; borderStyle: dashed;">
+          <a-icon type="plus"/>New Tag
+        </a-tag>
+      </a-spin>
+    </div>
   </a-drawer>
 </template>
 <script>
@@ -113,7 +151,7 @@ export default {
   data () {
     return {
       drawerVisible: true,
-      statusTop: this.article ? this.article.sort : 0, // 0-不置顶，1-3越大优先级越高,
+
       labelCol: { span: 4, offset: 0 },
       wrapperCol: { span: 18, offset: 1 },
       other: '',
@@ -144,7 +182,13 @@ export default {
           { required: true, message: 'Please select activity resource', trigger: 'change' }
         ],
         desc: [{ required: false, message: 'Please input activity form', trigger: 'blur' }]
-      }
+      },
+
+      tags: [],
+      tagsSpinning: true,
+
+      tagInputVisible: false,
+      tagInputValue: ''
     }
   },
   computed: {
@@ -157,6 +201,9 @@ export default {
       return ''
     }
   },
+  mounted () {
+    this.getTags()
+  },
   methods: {
     closeInfoDrawer () {
       this.drawerVisible = false
@@ -164,12 +211,7 @@ export default {
     openInfoDrawer () {
       this.drawerVisible = true
     },
-    handleChangeFolders (value, option) {
-      console.log(value, option)
-    },
-    handleChangeTop (e) {
-      this.statusTop = e.target.value
-    },
+
     onSubmit () {
       this.$refs.ruleForm.validate(valid => {
         if (valid) {
@@ -180,8 +222,37 @@ export default {
         }
       })
     },
-    resetForm () {
-      this.$refs.ruleForm.resetFields()
+
+    getTags () {
+      this.$http.get('/api/user/tags').then(res => {
+        console.log(res)
+        this.tags = res.result
+        this.tagsSpinning = false
+      })
+    },
+    handleTagClose (removeTag) {
+      this.tags = this.tags.filter(tag => tag !== removeTag)
+    },
+    showTagInput () {
+      this.tagInputVisible = true
+      this.$nextTick(() => {
+        this.$refs.tagInput.focus()
+      })
+    },
+    handleInputChange (e) {
+      this.tagInputValue = e.target.value
+    },
+    handleTagInputConfirm () {
+      const inputValue = this.tagInputValue
+      let tags = this.tags
+      if (inputValue && !tags.includes(inputValue)) {
+        tags = [...tags, inputValue]
+      }
+      Object.assign(this, {
+        tags,
+        tagInputVisible: false,
+        tagInputValue: ''
+      })
     }
   }
 }

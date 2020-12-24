@@ -11,26 +11,27 @@
       <a-button class="menu-add-dir-btn menu-transition" type="primary" shape="round" icon="folder-add">
         {{ collapsed?'':'新建文件夹' }}
       </a-button>
-      <a-menu
-        class="menu-wrapper"
-        v-model="selectedKeys"
-        mode="inline"
-        theme="dark"
-        :inline-collapsed="collapsed"
-        @click="handleMenuClick">
-        <template v-for="folder in folders">
-          <a-menu-item :key="folder.fid">
-            <a-icon :type="selectedKeys[0] !== folder.fid?'folder':'folder-open'" />
-            <span>{{ folder.name }}</span>
-            <a-icon
-              type="edit"
-              style="right: 0;position: absolute; top: 35%"
-              v-if="!collapsed && selectedKeys[0] === folder.fid"
-              @click="() => {$message.info('只是一个DEMO') }"
-            />
-          </a-menu-item>
-        </template>
-      </a-menu>
+      <div class="menu-wrapper">
+        <a-menu
+          v-model="selectedKeys"
+          mode="inline"
+          theme="dark"
+          :inline-collapsed="collapsed"
+          @click="handleMenuClick">
+          <template v-for="folder in folders">
+            <a-menu-item :key="folder.fid">
+              <a-icon :type="selectedKeys[0] !== folder.fid?'folder':'folder-open'" />
+              <span>{{ folder.name }}</span>
+              <a-icon
+                type="edit"
+                style="right: 0;position: absolute; top: 35%"
+                v-if="!collapsed && selectedKeys[0] === folder.fid"
+                @click="() => {$message.info('只是一个DEMO') }"
+              />
+            </a-menu-item>
+          </template>
+        </a-menu>
+      </div>
     </a-layout-sider>
 
     <a-layout>
@@ -40,15 +41,15 @@
         @collapse="handleCollapsed"
         v-model="collapsed"
       >
-        <article-menu-list :collapsed="collapsed" :folder="selectedFolder" @changeSelect="onSelected"/>
         <div class="article-list-wrapper-btn">
           <a-icon type="file-add" style="font-size: 16px;"/>
           <span :class="!collapsed ? 'article-list-wrapper-text':'article-list-wrapper-text-collapsed'">新建文档</span>
         </div>
+        <article-menu-list :collapsed="collapsed" :folder="selectedFolder" @changeSelect="onSelected"/>
       </a-layout-sider>
 
-      <a-layout-content style="margin: 0 0; width: 100% ;height: 100%">
-        <article-editor :article="selectedArticle"/>
+      <a-layout-content style="margin: 0 0; width: 100% ;height: 100%;max-height: 100%">
+        <article-editor class="article-editor" :article="selectedArticle"/>
       </a-layout-content>
     </a-layout>
   </a-layout>
@@ -82,12 +83,13 @@ export default {
       this.loading = false
       this.folders = res.result
       this.selectedKeys = [this.folders[0].fid]
+      this.selectedFolder = this.folders[0]
     })
   },
   methods: {
     getDate (callback) {
       getFolders().then(res => {
-        console.log(res)
+        console.log('getFolders', res)
         callback(res)
       })
     },
@@ -113,6 +115,17 @@ export default {
 </script>
 <style lang="less" scoped>
 @import "~ant-design-vue/es/style/themes/default.less";
+
+.menu-wrapper{
+  position: fixed;
+  left: 0;
+  overflow-y: scroll;
+  height: 72vh;
+  width: 200px;
+  &::-webkit-scrollbar {
+    width: 0;
+  }
+}
 
 .menu-top-btn{
   height: 50px;
@@ -158,16 +171,17 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 48px;
-    background-color: @primary-color;
-    color: white;
+    height: 70px;
+    background-color: white;
+    color: #434343;
     cursor: pointer;
     font-weight: 400;
-    font-size: 14px;
+    font-size: 18px;
+    border-bottom: 1px solid color(~`colorPalette('#ffffff', 5) `);
 
     &:hover{
-      background-color: color(~`colorPalette('@{primary-color}', 5) `);
-      color: white;
+      background-color: color(~`colorPalette('#ffffff', 5) `);
+      color: #141414;
     }
   }
   &-text{
@@ -182,5 +196,10 @@ export default {
     width: 0;
     transition: opacity 0.2s @ease-in-out ,margin 0.3s @ease-in-out ,width 0.3s @ease-in-out;
   }
+}
+
+.article-editor{
+  max-height: 100vh;
+  overflow: hidden;
 }
 </style>

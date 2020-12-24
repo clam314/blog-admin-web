@@ -19,7 +19,7 @@
         @click="() => {onSelectChange(item)}">
         <div class="list-item-content" >
           <a-list-item-meta>
-            <a slot="title" class="list-title">{{ ellipsis(item.title,25) }}</a>
+            <a slot="title" class="list-title" :class="!collapsed? 'list-title-normal' : 'list-title-collapsed'">{{ item.title }}</a>
             <a-avatar
               class="list-icon"
               slot="avatar"
@@ -27,7 +27,7 @@
               :icon="fileIcon(item.content)"
             />
             <div slot="description" class="list-description" :class="!collapsed? 'list-description-normal' : 'list-description-collapsed'">
-              {{ ellipsis(item.description,14) }}
+              {{ item.description }}
             </div>
           </a-list-item-meta>
         </div>
@@ -42,6 +42,7 @@
 import { getFileTypeForIcon } from '@/utils/util'
 import infiniteScroll from 'vue-infinite-scroll'
 import defaultSettings from '@/config/defaultSettings'
+import { getArticles } from '@/api/article'
 
 export default {
   directives: {
@@ -62,6 +63,8 @@ export default {
     return {
       loading: false,
       busy: false,
+      pageNum: 1,
+      pageCount: 10,
       selectedItem: null,
       iconColor: defaultSettings.primaryColor,
       data: []
@@ -70,14 +73,14 @@ export default {
   beforeMount () {
     this.busy = true
     this.loading = true
-    this.getData(res => {
-      this.loading = false
-      this.busy = false
-      if (res.result) {
-        this.data = res.result
-        this.onSelectChange(this.data[0])
-      }
-    })
+    // this.getData(res => {
+    //   this.loading = false
+    //   this.busy = false
+    //   if (res.result) {
+    //     this.data = res.result
+    //     this.onSelectChange(this.data[0])
+    //   }
+    // })
   },
   watch: {
     folder (val) {
@@ -90,7 +93,7 @@ export default {
           this.loading = false
           this.busy = false
           if (res.result) {
-            this.data = res.result
+            this.data = res.result.list
             this.onSelectChange(this.data[0])
           }
         })
@@ -99,16 +102,24 @@ export default {
   },
   methods: {
     getData (callback) {
-      this.$http.get('/list/articles').then(res => {
-        console.log(res)
+      const param = {
+        fid: this.folder.fid,
+        pageNum: this.pageNum,
+        pageCount: this.pageCount
+      }
+      getArticles(param).then(res => {
+        this.pageNum = this.pageNum + 1
         callback(res)
       })
     },
     onLoadMore () {
+      if (!this.folder || !this.folder.fid) {
+        return
+      }
       this.busy = true
       this.loading = true
       this.getData(res => {
-        this.data = this.data.concat(res.result)
+        this.data = this.data.concat(res.result.list)
         this.loading = false
         this.busy = false
         this.$nextTick(() => {
@@ -139,18 +150,25 @@ export default {
 
 .infinite-container {
   overflow: auto;
-  height: calc(100vh - 48px);
+  height: calc(100vh - 70px);
   &::-webkit-scrollbar {
     width: 0;
   }
 
+  @wrapper-width: 300px;
+  @wrapper-width-collapsed: 120px;
+
+  @wrapper-padding : 15px;
+  @icon-width : 32px;
+  @icon-gutter : 16px;
+  @wrapper-after-width: 3px;
   .list-item{
     max-height: 85px;
     cursor: pointer;
     background-color: transparent;
     transition: background-color .3s @ease-in-out;
     &:after{
-      border-right: 3px solid  @primary-color;
+      border-right: @wrapper-after-width solid  @primary-color;
       content: '';
       height: 84px;
       -webkit-transform: scaleY(.0001);
@@ -160,45 +178,62 @@ export default {
     }
 
     &-content{
-      padding: 0 15px;
+      padding: 0 @wrapper-padding;
     }
 
     &-selected{
       background-color: #fafafa;
       transition: background-color .3s @ease-in-out;
-    }
 
-    &-selected:after{
-      -webkit-transform: scaleY(1);
-      transform: scaleY(1);
-      opacity: 1;
-      transition: transform .3s @ease-in-out,opacity .3s @ease-in-out,-webkit-transform .3s @ease-in-out;
+      &:after{
+        -webkit-transform: scaleY(1);
+        transform: scaleY(1);
+        opacity: 1;
+        transition: transform .3s @ease-in-out,opacity .3s @ease-in-out,-webkit-transform .3s @ease-in-out;
+      }
     }
   }
 
-  .list-title{
-    width: 100%;
+  @list-title: list-title;
+  @list-description: list-description;
+
+  .@{list-title} , .@{list-description} {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    display: block;
   }
 
-  .list-description {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  .@{list-title}-normal, .@{list-description}-normal{
+    width: @wrapper-width - @wrapper-padding*2 - @icon-gutter -  @icon-width - @wrapper-after-width;
+    transition: width 0.3s @ease-in-out
+  }
 
-    &-normal{
-      opacity: 1;
-      height: auto;
-      transition: opacity 0.3s @ease-in-out, height 0.3s @ease-in-out;
-    }
+  .@{list-title}-collapsed, .@{list-description}-collapsed {
+    width: @wrapper-width-collapsed - @wrapper-padding*2 - @icon-gutter -  @icon-width - @wrapper-after-width;
+    transition: width 0.3s @ease-in-out
+  }
 
-    &-collapsed{
-      opacity: 0;
-      height: 0;
-      transition: opacity 0.3s @ease-in-out, height 0.3s @ease-in-out;
-    }
+  .@{list-title}-normal {
+    margin-top: 0;
+    transition: margin-top 0.3s @ease-in-out
+  }
+
+  .@{list-title}-collapsed {
+    margin-top: 5px;
+    transition: margin-top 0.3s @ease-in-out
+  }
+
+  .@{list-description}-normal{
+    opacity: 1;
+    height: auto;
+    transition: opacity 0.3s @ease-in-out, height 0.3s @ease-in-out;
+  }
+
+  .@{list-description}-collapsed{
+    opacity: 0;
+    height: 0;
+    transition: opacity 0.3s @ease-in-out, height 0.3s @ease-in-out;
   }
 
   .list-icon {
