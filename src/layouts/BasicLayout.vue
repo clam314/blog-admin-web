@@ -24,7 +24,7 @@
     <template v-slot:headerContentRender>
       <div>
         <a-tooltip title="刷新页面">
-          <a-icon type="reload" style="font-size: 18px;cursor: pointer;" @click="handleReload" />
+          <a-icon type="reload" style="font-size: 18px;cursor: pointer;" @click="handleReload" v-if="false"/>
         </a-tooltip>
       </div>
     </template>
@@ -39,7 +39,7 @@
     </template>
     <!-- custom footer / 自定义Footer -->
     <template v-slot:footerRender>
-      <global-footer />
+      <global-footer style="margin: 0 0" />
     </template>
     <router-view />
   </pro-layout>
@@ -136,7 +136,7 @@ export default {
   methods: {
     i18nRender,
     handleReload () {
-      this.$router.push({ name: 'Edit' })
+      // this.$router.push({ name: 'Edit' })
     },
     handleMediaQuery (val) {
       this.query = val

@@ -32,36 +32,44 @@ export const asyncRouterMap = [
         ]
       },
       // list
+      // {
+      //   path: '/list',
+      //   name: 'list',
+      //   component: RouteView,
+      //   redirect: '/list/search/article',
+      //   hideChildrenInMenu: true,
+      //   meta: { title: 'menu.list', icon: 'table', permission: ['table'] },
+      //   children: [
+      //     {
+      //       path: '/list/search',
+      //       name: 'SearchList',
+      //       component: () => import('@/views/list/search/SearchLayout'),
+      //       redirect: '/list/search/article',
+      //       meta: { title: 'menu.list.search-list', keepAlive: true, permission: ['table'] },
+      //       children: [
+      //         {
+      //           path: '/list/search/article',
+      //           name: 'SearchArticles',
+      //           component: () => import('../views/list/search/Article'),
+      //           meta: { title: 'menu.list.search-list.articles', permission: ['table'] }
+      //         },
+      //         {
+      //           path: '/list/search/project',
+      //           name: 'SearchProjects',
+      //           component: () => import('../views/list/search/Projects'),
+      //           meta: { title: 'menu.list.search-list.projects', permission: ['table'] }
+      //         }
+      //       ]
+      //     }
+      //   ]
+      // },
+
+      //
       {
-        path: '/list',
-        name: 'list',
-        component: RouteView,
-        redirect: '/list/search/article',
-        hideChildrenInMenu: true,
-        meta: { title: 'menu.list', icon: 'table', permission: ['table'] },
-        children: [
-          {
-            path: '/list/search',
-            name: 'SearchList',
-            component: () => import('@/views/list/search/SearchLayout'),
-            redirect: '/list/search/article',
-            meta: { title: 'menu.list.search-list', keepAlive: true, permission: ['table'] },
-            children: [
-              {
-                path: '/list/search/article',
-                name: 'SearchArticles',
-                component: () => import('../views/list/search/Article'),
-                meta: { title: 'menu.list.search-list.articles', permission: ['table'] }
-              },
-              {
-                path: '/list/search/project',
-                name: 'SearchProjects',
-                component: () => import('../views/list/search/Projects'),
-                meta: { title: 'menu.list.search-list.projects', permission: ['table'] }
-              }
-            ]
-          }
-        ]
+        path: '/article',
+        redirect: '/edit',
+        name: 'article',
+        meta: { title: '文章编辑', icon: 'edit', keepAlive: true, permission: ['user'] }
       },
 
       // account
