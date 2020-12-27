@@ -69,7 +69,7 @@ export const asyncRouterMap = [
         path: '/article',
         redirect: '/edit',
         name: 'article',
-        meta: { title: '文章编辑', icon: 'edit', keepAlive: true, permission: ['user'] }
+        meta: { title: '文章编辑', icon: 'edit', keepAlive: true, permission: ['edit'] }
       },
 
       // account
