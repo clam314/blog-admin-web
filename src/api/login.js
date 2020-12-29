@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 const userApi = {
   Initial: '/user/initial',
-  Login: '/auth/login',
+  Login: '/login/login',
   Logout: '/auth/logout',
   ForgePassword: '/auth/forge-password',
   Register: '/auth/register',

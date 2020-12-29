@@ -14,7 +14,7 @@ import infiniteScroll from 'vue-infinite-scroll'
 
 // mock
 // WARNING: `mockjs` NOT SUPPORT `IE` PLEASE DO NOT USE IN `production` ENV.
-import './mock' // 关闭mock，与服务器联调
+// import './mock' // 关闭mock，与服务器联调
 
 import bootstrap from './core/bootstrap'
 import './core/lazy_use' // use lazy load components

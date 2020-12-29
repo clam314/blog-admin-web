@@ -5,7 +5,6 @@ import notification from 'ant-design-vue/es/notification'
 import { VueAxios } from './axios'
 import { ACCESS_TOKEN } from '@/store/mutation-types'
 import { createPublicHeaders } from '@/utils/requestHelper'
-import { appKey } from '@/config/request.config'
 
 // 创建 axios 实例
 const request = axios.create({
@@ -47,11 +46,12 @@ const errorHandler = (error) => {
 request.interceptors.request.use(config => {
   const token = storage.get(ACCESS_TOKEN) || ''
   const head = createPublicHeaders(token)
-  config.data = {
-    head,
-    data: config.data
-  }
-  config.headers['appKey'] = appKey
+  // config.data = {
+  //   head,
+  //   data: config.data
+  // }
+  // config.headers['appKey'] = appKey
+  Object.assign(config.headers, head)
   console.log('request: ', config)
   return config
 }, errorHandler)

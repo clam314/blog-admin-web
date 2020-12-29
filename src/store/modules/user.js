@@ -71,7 +71,9 @@ const user = {
             const role = result.role
             role.permissions = result.role.permissions
             role.permissions.map(per => {
-              if (per.actionEntitySet != null && per.actionEntitySet.length > 0) {
+              // 指令相关的内容还没用上，先屏蔽
+              // eslint-disable-next-line no-constant-condition
+              if (false && per.actionEntitySet != null && per.actionEntitySet.length > 0) {
                 const action = per.actionEntitySet.map(action => { return action.action })
                 per.actionList = action
               }
