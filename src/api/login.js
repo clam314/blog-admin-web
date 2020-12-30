@@ -1,7 +1,7 @@
 import request from '@/utils/request'
 
 const userApi = {
-  Initial: '/user/initial',
+  Initial: '/login/initial',
   Login: '/login/login',
   Logout: '/auth/logout',
   ForgePassword: '/auth/forge-password',
@@ -18,10 +18,11 @@ const userApi = {
  * 初始化获取appSecret等初始化信息
  * @returns {AxiosPromise}
  */
-export function initial () {
+export function initial (parameter) {
   return request({
     url: userApi.Initial,
-    method: 'post'
+    method: 'post',
+    data: parameter
   })
 }
 

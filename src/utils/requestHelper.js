@@ -1,6 +1,6 @@
 import md5 from 'js-md5'
 import JSEncrypt from 'jsencrypt'
-import { pubKey } from '@/config/request.config'
+import { pubKey, appKey } from '@/config/request.config'
 
 const $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
 
@@ -52,16 +52,10 @@ function createRequestId () {
   return randomString(8) + currentTimeString()
 }
 
-/**
- * 创建公共的请求参数
- * @param appKey
- * @param token
- * @returns {{requestId: string, uuid: (string|void), token: string}}
- */
-export function createPublicHeaders (token) {
-  const appSecret = sessionStorage.appSecret // 从初始化接口中获取
+export function createPublicHeaders (token, appSecret) {
   const uuid = localStorage.getItem('uuid') || createUUID()
   const header = {
+    appKey: appKey,
     token,
     requestId: createRequestId(),
     uuid

@@ -2,4 +2,4 @@
 export const pubKey = ''
 
 // appKey 根据环境自行修改
-export const appKey = '5678967465'
+export const appKey = '385939'

@@ -3,7 +3,7 @@ import store from '@/store'
 import storage from 'store'
 import notification from 'ant-design-vue/es/notification'
 import { VueAxios } from './axios'
-import { ACCESS_TOKEN } from '@/store/mutation-types'
+import { ACCESS_TOKEN, APP_SECRET } from '@/store/mutation-types'
 import { createPublicHeaders } from '@/utils/requestHelper'
 
 // 创建 axios 实例
@@ -45,12 +45,8 @@ const errorHandler = (error) => {
 // request interceptor
 request.interceptors.request.use(config => {
   const token = storage.get(ACCESS_TOKEN) || ''
-  const head = createPublicHeaders(token)
-  // config.data = {
-  //   head,
-  //   data: config.data
-  // }
-  // config.headers['appKey'] = appKey
+  const appSecret = storage.get(APP_SECRET) || ''
+  const head = createPublicHeaders(token, appSecret)
   Object.assign(config.headers, head)
   console.log('request: ', config)
   return config

@@ -2,6 +2,7 @@ import storage from 'store'
 import { initial, login, getInfo, logout } from '@/api/login'
 import { ACCESS_TOKEN, APP_SECRET } from '@/store/mutation-types'
 import { welcome } from '@/utils/util'
+import { appKey } from '@/config/request.config'
 
 const user = {
   state: {
@@ -40,10 +41,13 @@ const user = {
     // 初始化
     Initial ({ commit }) {
       return new Promise((resolve, reject) => {
-        initial().then(response => {
+        initial({ appKey }).then(response => {
           const { result: { appSecret } } = response
           storage.set(APP_SECRET, appSecret, 7 * 24 * 60 * 60 * 1000)
           commit('SET_APP_SECRET', appSecret)
+          resolve()
+        }).catch(error => {
+          reject(error)
         })
       })
     },
