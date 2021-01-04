@@ -64,7 +64,7 @@
       centered
       :confirm-loading="confirmLoading"
       :closable="false"
-      @ok="handleOK"
+      @ok="handleNewFolderOK"
     >
       <a-form-model ref="folderForm" :rules="folderRules" :model="folderForm">
         <a-form-model-item label="文件夹名称" prop="folderName">
@@ -78,9 +78,9 @@
       centered
       :confirm-loading="confirmLoading"
       :closable="false"
-      @ok="handleOK"
+      @ok="handleNewArticleOK"
     >
-      <a-form-model ref="folderForm" :rules="articleRules" :model="articleForm">
+      <a-form-model ref="articleForm" :rules="articleRules" :model="articleForm">
         <a-form-model-item label="文档名称" prop="articleTitle">
           <a-input v-model="articleForm.articleTitle" placeholder="请输入文档名称" />
         </a-form-model-item>
@@ -92,9 +92,11 @@
   </a-layout>
 </template>
 
-<script>import ArticleMenuList from '@/views/edit/ArticleMenuList'
+<script>
+import ArticleMenuList from '@/views/edit/ArticleMenuList'
 import ArticleEditor from '@/views/edit/ArticleEditor'
-import { getFolders } from '@/api/article'
+import { getFolders, addFolder } from '@/api/folder'
+import { addArticle } from '@/api/article'
 
 export default {
   components: {
@@ -132,21 +134,23 @@ export default {
     }
   },
   mounted () {
-    this.loading = true
-    this.getDate(res => {
-      this.loading = false
-      this.folders = res.result
-      this.selectedKeys = [this.folders[0].fid]
-      this.selectedFolder = this.folders[0]
-    })
+    this.getDate()
   },
   methods: {
-    getDate (callback) {
+    getDate () {
+      this.loading = true
       getFolders().then(res => {
-        console.log('getFolders', res)
-        callback(res)
+        this.loading = false
+        if (res.head && res.head.respCode !== 200) {
+          this.$message.error(res.head.respMsg, 1)
+        } else {
+          if (Array.isArray(res.result) && res.result.length > 0) {
+            this.folders = res.result
+            this.selectedKeys = [this.folders[0].fid]
+            this.selectedFolder = this.folders[0]
+          }
+        }
       }).catch(e => {
-        console.log('getFolders', e)
         this.loading = false
       })
     },
@@ -163,7 +167,7 @@ export default {
       }
     },
     handleNewArticleClick () {
-      if (this.selectedFolder === null) {
+      if (this.selectedFolder === null || !this.selectedFolder.fid) {
         this.$message.error('请先选择文件夹！', 1)
       } else {
         this.articleForm.articleTitle = ''
@@ -171,14 +175,44 @@ export default {
         this.articleBtnVisible = true
       }
     },
-    handleOK (e) {
+    handleNewArticleOK (e) {
+      this.$refs['articleForm'].validate(valid => {
+        if (valid) {
+          this.confirmLoading = true
+          addArticle({
+            title: this.articleForm.articleTitle,
+            description: this.articleForm.articleDescription,
+            fid: this.selectedFolder.fid
+          }).then(res => {
+            this.confirmLoading = false
+            if (res.head && res.head.respCode !== 200) {
+              this.$message.error(res.head.respMsg, 1)
+            } else {
+              this.articleBtnVisible = false
+            }
+          }).catch(e => {
+            this.confirmLoading = false
+          })
+        } else {
+          return false
+        }
+      })
+    },
+    handleNewFolderOK (e) {
       this.$refs['folderForm'].validate(valid => {
         if (valid) {
           this.confirmLoading = true
-          setTimeout(() => {
+          addFolder({ name: this.folderForm.folderName }).then(res => {
             this.confirmLoading = false
-            this.folderBtnVisible = false
-          }, 5000)
+            if (res.head && res.head.respCode !== 200) {
+              this.$message.error(res.head.respMsg, 1)
+            } else {
+              this.folderBtnVisible = false
+              this.getDate()
+            }
+          }).catch(e => {
+            this.confirmLoading = false
+          })
         } else {
           return false
         }

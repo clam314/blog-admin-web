@@ -61,8 +61,8 @@ export default {
     return {
       loading: false,
       busy: false,
-      pageNum: 1,
-      pageCount: 10,
+      pageNum: 0,
+      pageCount: 15,
       selectedItem: null,
       iconColor: defaultSettings.primaryColor,
       data: []

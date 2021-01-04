@@ -1,28 +1,13 @@
 import request from '@/utils/request'
 
 const articleApi = {
+  GetArticles: '/article/list',
+  AddArticle: '/article/add',
   MdArticleList: '/list/articles/md',
   GetMdArticle: '/article/markdown/',
   SaveMdArticle: '/article/markdown',
   UpdateMdStatus: '/article/markdown/status',
-  DelMdArticle: '/article/markdown/',
-  GetArticles: '/list/articles' // TODO
-}
-
-const folderApi = {
-  GetFolders: '/list/folders'// TODO
-}
-
-/**
- * 获取文件夹列表
- * @param parameter
- * @returns {AxiosPromise}
- */
-export function getFolders () {
-  return request({
-    url: folderApi.GetFolders,
-    method: 'post'
-  })
+  DelMdArticle: '/article/markdown/'
 }
 
 /**
@@ -44,6 +29,14 @@ export function getArticles (parameter) {
   })
 }
 
+export function addArticle (parameter) {
+  return request({
+    url: articleApi.AddArticle,
+    method: 'post',
+    data: parameter
+  })
+}
+
 export function getMarkdownArticles () {
   return request({
     url: articleApi.MdArticleList,
@@ -57,6 +50,7 @@ export function getMarkdownArticle (documentId) {
     method: 'get'
   })
 }
+
 export function saveMarkdownArticle (parameter) {
   return request({
     url: articleApi.SaveMdArticle,
