@@ -8,10 +8,16 @@
         <a-icon :class="{'menu-top-btn-action-i': collapsed}" type="arrow-left"/>
         <span :class="{'menu-top-btn-action-span': !collapsed}">返回</span>
       </div>
-      <a-button class="menu-add-dir-btn menu-transition" type="primary" shape="round" icon="folder-add">
+      <a-button
+        class="menu-add-dir-btn menu-transition"
+        type="primary"
+        shape="round"
+        icon="folder-add"
+        @click="() => {this.folderBtnVisible = true;this.folderForm.folderName=''}"
+      >
         {{ collapsed?'':'新建文件夹' }}
       </a-button>
-      <div class="menu-wrapper">
+      <a-spin :spinning="loading" class="menu-wrapper">
         <a-menu
           v-model="selectedKeys"
           mode="inline"
@@ -31,7 +37,7 @@
             </a-menu-item>
           </template>
         </a-menu>
-      </div>
+      </a-spin>
     </a-layout-sider>
 
     <a-layout>
@@ -41,7 +47,7 @@
         @collapse="handleCollapsed"
         v-model="collapsedArticleList"
       >
-        <div class="article-list-wrapper-btn">
+        <div class="article-list-wrapper-btn" @click="handleNewArticleClick">
           <a-icon type="file-add" style="font-size: 16px;"/>
           <span :class="!collapsedArticleList ? 'article-list-wrapper-text':'article-list-wrapper-text-collapsed'">新建文档</span>
         </div>
@@ -52,11 +58,41 @@
         <article-editor class="article-editor" :article="selectedArticle" :folders="folders"/>
       </a-layout-content>
     </a-layout>
+    <a-modal
+      v-model="folderBtnVisible"
+      :title="addBtnTitle"
+      centered
+      :confirm-loading="confirmLoading"
+      :closable="false"
+      @ok="handleOK"
+    >
+      <a-form-model ref="folderForm" :rules="folderRules" :model="folderForm">
+        <a-form-model-item label="文件夹名称" prop="folderName">
+          <a-input v-model="folderForm.folderName" placeholder="请输入文件夹名称" />
+        </a-form-model-item>
+      </a-form-model>
+    </a-modal>
+    <a-modal
+      v-model="articleBtnVisible"
+      title="新建文档"
+      centered
+      :confirm-loading="confirmLoading"
+      :closable="false"
+      @ok="handleOK"
+    >
+      <a-form-model ref="folderForm" :rules="articleRules" :model="articleForm">
+        <a-form-model-item label="文档名称" prop="articleTitle">
+          <a-input v-model="articleForm.articleTitle" placeholder="请输入文档名称" />
+        </a-form-model-item>
+        <a-form-model-item label="文档介绍" prop="articleDescription">
+          <a-input v-model="articleForm.articleDescription" type="textarea" />
+        </a-form-model-item>
+      </a-form-model>
+    </a-modal>
   </a-layout>
 </template>
 
-<script>
-import ArticleMenuList from '@/views/edit/ArticleMenuList'
+<script>import ArticleMenuList from '@/views/edit/ArticleMenuList'
 import ArticleEditor from '@/views/edit/ArticleEditor'
 import { getFolders } from '@/api/article'
 
@@ -70,12 +106,29 @@ export default {
       loading: false,
       collapsed: false,
       collapsedArticleList: false,
+      folderBtnVisible: false,
+      articleBtnVisible: false,
       addBtnTitle: '新建文件',
       selectedKeys: [],
       mdValue: '',
       folders: [],
       selectedArticle: null,
-      selectedFolder: null
+      selectedFolder: null,
+      confirmLoading: false,
+      folderRules: {
+        folderName: { required: true, message: '文件夹名称不能为空', trigger: 'blur' }
+      },
+      folderForm: {
+        folderName: ''
+      },
+      articleRules: {
+        articleTitle: { required: true, message: '文档名称不能为空', trigger: 'blur' },
+        articleDescription: [{ max: 200, message: '简单描述文章内容，请输入200字以内。', trigger: 'blur' }]
+      },
+      articleForm: {
+        articleTitle: '',
+        articleDescription: ''
+      }
     }
   },
   mounted () {
@@ -92,6 +145,9 @@ export default {
       getFolders().then(res => {
         console.log('getFolders', res)
         callback(res)
+      }).catch(e => {
+        console.log('getFolders', e)
+        this.loading = false
       })
     },
     handleCollapsed (collapsed, type) {
@@ -105,6 +161,28 @@ export default {
       if (item) {
         this.selectedArticle = item
       }
+    },
+    handleNewArticleClick () {
+      if (this.selectedFolder === null) {
+        this.$message.error('请先选择文件夹！', 1)
+      } else {
+        this.articleForm.articleTitle = ''
+        this.articleForm.articleDescription = ''
+        this.articleBtnVisible = true
+      }
+    },
+    handleOK (e) {
+      this.$refs['folderForm'].validate(valid => {
+        if (valid) {
+          this.confirmLoading = true
+          setTimeout(() => {
+            this.confirmLoading = false
+            this.folderBtnVisible = false
+          }, 5000)
+        } else {
+          return false
+        }
+      })
     }
   },
   computed: {
@@ -115,9 +193,10 @@ export default {
   watch: {
     collapsed (newVal, oldVal) {
       if (newVal !== oldVal) {
-        setTimeout(() => {
-          this.collapsedArticleList = this.collapsed
-        }, 300)
+        this.collapsedArticleList = this.collapsed
+        // setTimeout(() => {
+        //   this.collapsedArticleList = this.collapsed
+        // }, 300)
       }
     }
   }

@@ -1,32 +1,34 @@
 <template>
-  <a-layout class="editor-wrapper">
-    <a-layout-header class="editor-header">
-      <a-input
-        class="editor-title"
-        v-model="markdownForm.title"
-        size="large">
-        <a-icon slot="addonAfter" type="delete" @click="deleteArticle" />
-        <a-icon slot="addonAfter" type="menu-unfold" @click="openInfoDrawer"/>
-      </a-input>
-    </a-layout-header>
-    <a-layout-content>
-      <mavon-editor
-        class="editor-md"
-        ref="md"
-        @save="save"
-        @imgAdd="imgAdd"
-        @imgDel="imgDel"
-        v-model="markdownForm.contentMarkdown"
-        :codeStyle="markdown.codeStyle"
-        :toolbars="markdown.toolbars"
-        :toolbarsBackground="markdown.toolbarsBackground"
-        :editorBackground="markdown.editorBackground"
-        :style="{backgroundColor: markdown.editorBackground}"
-        :previewBackground="markdown.previewBackground"
-      />
-    </a-layout-content>
-    <article-status-drawer ref="aStatus" :article="article" :folders="folders"/>
-  </a-layout>
+  <a-spin :spinning="spinning" class="editor-wrapper">
+    <a-layout class="editor-wrapper">
+      <a-layout-header class="editor-header">
+        <a-input
+          class="editor-title"
+          v-model="markdownForm.title"
+          size="large">
+          <a-icon slot="addonAfter" type="delete" @click="deleteArticle" />
+          <a-icon slot="addonAfter" type="menu-unfold" @click="openInfoDrawer"/>
+        </a-input>
+      </a-layout-header>
+      <a-layout-content>
+        <mavon-editor
+          class="editor-md"
+          ref="md"
+          @save="save"
+          @imgAdd="imgAdd"
+          @imgDel="imgDel"
+          v-model="markdownForm.contentMarkdown"
+          :codeStyle="markdown.codeStyle"
+          :toolbars="markdown.toolbars"
+          :toolbarsBackground="markdown.toolbarsBackground"
+          :editorBackground="markdown.editorBackground"
+          :style="{backgroundColor: markdown.editorBackground}"
+          :previewBackground="markdown.previewBackground"
+        />
+      </a-layout-content>
+      <article-status-drawer ref="aStatus" :article="article" :folders="folders"/>
+    </a-layout>
+  </a-spin>
 </template>
 
 <script>
@@ -52,6 +54,7 @@ export default {
   },
   data () {
     return {
+      spinning: true,
       local: true, // true-文档来源是本地，false-来源网络需要请求
       markdown: {
         codeStyle: 'atom-one-dark',
@@ -128,10 +131,22 @@ export default {
         this.markdownForm.articleId = tid
         this.markdownForm.title = title
         this.markdownForm.contentMarkdown = content
+        this.initData()
+      }
+    },
+    folders (val) {
+      if (val) {
+        this.initData()
       }
     }
   },
   methods: {
+    initData () {
+      if (!this.article || !this.folders) {
+        return
+      }
+      this.spinning = false
+    },
     getArticle () { // 获取文章内容
       const id = this.$route.query.a
       if (id == null) {
@@ -201,7 +216,11 @@ export default {
 
 .editor-wrapper{
   width: 100%;
-  height: 100%;
+  height: 100vh;
+
+  /deep/ .ant-spin{
+    max-height: 100%;
+  }
 
   .editor-header{
     height: auto;
