@@ -192,10 +192,9 @@ export default {
     margin-bottom: 24px;
 
     & > .avatar {
-      margin: 0 auto;
       width: 104px;
       height: 104px;
-      margin-bottom: 20px;
+      margin: 0 auto 20px;
       border-radius: 50%;
       overflow: hidden;
       img {
