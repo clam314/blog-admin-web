@@ -33,6 +33,9 @@
       <div v-if="loading" class="loading-container">
         <a-spin style="margin-top: 10px"/>
       </div>
+      <div v-if="noMore && data.length !== 0" >
+        <p style="margin:12px auto;font-size: 14px;font-weight: 400;text-align: center">没有更多了~</p>
+      </div>
     </a-list>
   </div>
 </template>
@@ -60,6 +63,7 @@ export default {
   data () {
     return {
       loading: false,
+      noMore: false,
       busy: false,
       pageNum: 0,
       pageCount: 15,
@@ -69,19 +73,16 @@ export default {
     }
   },
   beforeMount () {
-    this.busy = true
-    this.loading = true
+    this.resetLoad(true)
   },
   watch: {
     folder (val) {
       if (val) {
-        this.busy = true
-        this.loading = true
         this.data = []
+        this.noMore = false
+        this.pageNum = 0
         this.getData(res => {
-          this.loading = false
-          this.busy = false
-          if (res.result) {
+          if (res.result.list.length > 0) {
             this.data = res.result.list
             this.onSelectChange(this.data[0])
           }
@@ -90,31 +91,43 @@ export default {
     }
   },
   methods: {
+    resetLoad (b) {
+      this.loading = b
+      this.busy = b
+    },
     getData (callback) {
+      this.resetLoad(true)
       const param = {
         fid: this.folder.fid,
         pageNum: this.pageNum,
         pageCount: this.pageCount
       }
+      if (this.data.length > 0) {
+        param.tid = this.data[this.data.length - 1].tid
+      }
       getArticles(param).then(res => {
-        this.pageNum = this.pageNum + 1
-        callback(res)
+        if (res.head && res.head.respCode === 200 && Array.isArray(res.result.list)) {
+          this.noMore = res.result.list.length === 0
+          this.pageNum = res.result.pageNum + 1
+          callback(res)
+        }
+        this.resetLoad(false)
+      }).catch(e => {
+        this.resetLoad(false)
       })
     },
     onLoadMore () {
-      if (!this.folder || !this.folder.fid) {
+      if (!this.folder || !this.folder.fid || this.noMore) {
         return
       }
-      this.busy = true
-      this.loading = true
+      this.resetLoad(true)
       this.getData(res => {
-        this.data = this.data.concat(res.result.list)
-        this.loading = false
-        this.busy = false
-        this.$nextTick(() => {
-          window.dispatchEvent(new Event('resize'))
-        })
-      })
+        if (res.result.list.length > 0) {
+          this.data = this.data.concat(res.result.list)
+        }
+        this.$nextTick(() => window.dispatchEvent(new Event('resize')))
+        }
+      )
     },
     onSelectChange (item) {
       this.selectedItem = item

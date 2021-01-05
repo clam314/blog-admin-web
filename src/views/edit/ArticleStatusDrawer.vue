@@ -187,7 +187,6 @@ export default {
     }
   },
   mounted () {
-    this.getTags()
   },
   watch: {
     article (newVal) {
@@ -199,6 +198,8 @@ export default {
             this.form.status.push(this.statusKeys[i])
           }
         })
+        this.tagsSpinning = false
+        this.tags = this.article.tags
       }
       this.initData()
     },
@@ -211,8 +212,6 @@ export default {
       if (!this.article || !this.folders) {
         return
       }
-      // TODO 测试将文件夹id和文章id强行关联，接后台时需要删除
-      this.folders[5].fid = this.article.fid
       this.preparingForm = false
       this.form.publish = Boolean(this.article.published)
       this.form.desc = this.article.description || ''
