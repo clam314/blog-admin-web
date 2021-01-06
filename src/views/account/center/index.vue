@@ -31,14 +31,14 @@
                   <a-tag
                     :key="tag"
                     :closable="true"
-                    :close="() => handleTagClose(tag)"
+                    @close="() => handleTagClose(tag)"
                   >{{ `${tag.slice(0, 20)}...` }}</a-tag>
                 </a-tooltip>
                 <a-tag
                   v-else
                   :key="tag"
                   :closable="true"
-                  :close="() => handleTagClose(tag)"
+                  @close="() => handleTagClose(tag)"
                 >{{ tag }}</a-tag>
               </template>
               <a-input
@@ -81,7 +81,7 @@
 <script>
 import { PageView, RouteView } from '@/layouts'
 import { BasicSetting, Binding, Custom, Notification, Security } from './page'
-
+import { updateUserTags } from '@/api/user'
 import { mapGetters } from 'vuex'
 
 export default {
@@ -96,12 +96,9 @@ export default {
   },
   data () {
     return {
-      tags: [],
-      tagsSpinning: true,
-
+      tagsSpinning: false,
       tagInputVisible: false,
       tagInputValue: '',
-
       tabListNoTitle: [
         {
           key: 'setting',
@@ -128,28 +125,27 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['nickname', 'avatar', 'userInfo'])
+    ...mapGetters(['nickname', 'avatar', 'userInfo']),
+    tags: {
+      get () {
+        return this.$store.getters.tags
+      },
+      set (val) {
+        this.$store.commit('SET_TAGS', val)
+      }
+    }
   },
   mounted () {
-    // this.getTags()
-    this.tags = this.userInfo.tags
-    this.tagsSpinning = false
   },
   methods: {
-    getTags () {
-      this.$http.get('/api/user/tags').then(res => {
-        console.log(res)
-        this.tags = res.result
-        this.tagsSpinning = false
-      })
-    },
-
     handleTabChange (key, type) {
       this[type] = key
     },
 
     handleTagClose (removeTag) {
-      this.tags = this.tags.filter(tag => tag !== removeTag)
+     this.updateTags(removeTag, true, (rTag) => {
+        this.tags = this.tags.filter(tag => tag !== rTag)
+      })
     },
 
     showTagInput () {
@@ -164,16 +160,36 @@ export default {
     },
 
     handleTagInputConfirm () {
-      const inputValue = this.tagInputValue
-      let tags = this.tags
-      if (inputValue && !tags.includes(inputValue)) {
-        tags = [...tags, inputValue]
+      const reset = () => {
+        this.tagInputVisible = false
+        this.tagInputValue = ''
       }
-
-      Object.assign(this, {
-        tags,
-        tagInputVisible: false,
-        tagInputValue: ''
+      if (this.tagInputValue && !this.tags.includes(this.tagInputValue)) {
+        this.updateTags(this.tagInputValue, false, (newTag) => {
+          this.tags = [...this.tags, newTag]
+        }, reset)
+      } else {
+        reset()
+      }
+    },
+    updateTags (tag, isDelete, callback, reset = () => {}) {
+      if (!tag || tag === '') {
+        reset()
+        return
+      }
+      this.tagsSpinning = true
+      updateUserTags({ tag, isDelete }).then(res => {
+        this.tagsSpinning = false
+        if (res.head && res.head.respCode === 200) {
+          callback(tag, isDelete)
+        } else {
+          this.$message.error(res.head.respMsg)
+        }
+        reset()
+      }).catch(e => {
+        reset()
+        this.tagsSpinning = false
+        this.$message.error('更新标签，请刷新页面或稍后重试！')
       })
     }
   }

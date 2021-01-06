@@ -12,6 +12,7 @@ const user = {
     name: '',
     welcome: '',
     avatar: '',
+    tags: [],
     roles: [],
     info: {}
   },
@@ -35,6 +36,9 @@ const user = {
     },
     SET_INFO: (state, info) => {
       state.info = info
+    },
+    SET_TAGS: (state, tags) => {
+      state.tags = tags
     }
   },
 
@@ -92,6 +96,7 @@ const user = {
 
           commit('SET_NAME', { name: result.name, welcome: welcome() })
           commit('SET_AVATAR', result.avatar)
+          commit('SET_TAGS', result.tags)
 
           resolve(response)
         }).catch(error => {

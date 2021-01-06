@@ -111,13 +111,17 @@ export default {
             description: `基本信息更新成功！`
           })
           this.$store.dispatch('GetInfo').catch(e => {
-            this.$message.error('获取用户信息失败，请重新刷新页面！')
+            this.$message.error('获取用户信息失败，请刷新页面或稍后重试！')
           })
         } else {
           this.$message.error(res.head.respMsg)
         }
       }).catch(e => {
         this.submitting = false
+        this.$notification.error({
+          message: 'error',
+          description: `基本信息更新失败，请刷新页面或稍后重试！`
+        })
       })
     }
   }
