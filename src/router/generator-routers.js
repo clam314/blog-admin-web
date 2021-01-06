@@ -1,6 +1,4 @@
-// eslint-disable-next-line
-import * as loginService from '@/api/login'
-// eslint-disable-next-line
+import { getCurrentUserNav } from '@/api/user'
 import { BasicLayout, BlankLayout, PageView, RouteView } from '@/layouts'
 
 // 前端路由表
@@ -80,7 +78,7 @@ const rootRouter = {
  */
 export const generatorDynamicRouter = (token) => {
   return new Promise((resolve, reject) => {
-    loginService.getCurrentUserNav(token).then(res => {
+    getCurrentUserNav(token).then(res => {
       console.log('res', res)
       const { result } = res
       const menuNav = []

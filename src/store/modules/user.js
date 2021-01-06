@@ -1,5 +1,6 @@
 import storage from 'store'
-import { initial, login, getInfo, logout } from '@/api/login'
+import { initial, login, logout } from '@/api/login'
+import { getInfo } from '@/api/user'
 import { ACCESS_TOKEN, APP_SECRET } from '@/store/mutation-types'
 import { welcome } from '@/utils/util'
 import { appKey } from '@/config/request.config'

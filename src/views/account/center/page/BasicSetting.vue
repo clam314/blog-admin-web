@@ -3,29 +3,28 @@
     <a-row :gutter="16">
       <a-col :md="24" :lg="16">
 
-        <a-form layout="vertical">
-          <a-form-item
-            :label="$t('account.settings.basic.nickname')"
-          >
-            <a-input :placeholder="$t('account.settings.basic.nickname-message')" />
-          </a-form-item>
-          <a-form-item
-            :label="$t('account.settings.basic.profile')"
-          >
-            <a-textarea rows="4" :placeholder="$t('account.settings.basic.profile-message')"/>
-          </a-form-item>
+        <a-form-model
+          ref="form"
+          layout="vertical"
+          :rules="rules"
+          :model="form"
+        >
+          <a-form-model-item label="昵称" prop="nickName">
+            <a-input placeholder="请输入您的昵称" v-model="form.nickName"/>
+          </a-form-model-item>
 
-          <a-form-item
-            :label="$t('account.settings.basic.email')"
-            :required="false"
-          >
-            <a-input placeholder="example@ant.design"/>
-          </a-form-item>
+          <a-form-model-item label="个人简介" prop="introduction">
+            <a-textarea rows="4" placeholder="请输入个人简介" v-model="form.introduction"/>
+          </a-form-model-item>
 
-          <a-form-item>
-            <a-button type="primary">{{ $t('account.settings.basic.update') }}</a-button>
-          </a-form-item>
-        </a-form>
+          <a-form-model-item label="邮箱" prop="email">
+            <a-input placeholder="example@gmail.com" v-model="form.email"/>
+          </a-form-model-item>
+
+          <a-form-model-item>
+            <a-button type="primary" @click="onSubmit" :loading="submitting">更新基本信息</a-button>
+          </a-form-model-item>
+        </a-form-model>
 
       </a-col>
       <a-col :md="24" :lg="8" :style="{ minHeight: '180px' }">
@@ -40,13 +39,18 @@
 
     </a-row>
 
-    <avatar-modal ref="modal" @ok="setavatar"/>
+    <avatar-modal ref="modal" @ok="setAvatar"/>
 
   </div>
 </template>
 
 <script>
 import AvatarModal from './AvatarModal'
+import { validateEmail } from '@/utils/validate'
+import { updateUserInfo } from '@/api/user'
+import Vue from 'vue'
+import { FormModel } from 'ant-design-vue'
+Vue.use(FormModel)
 
 export default {
   components: {
@@ -70,12 +74,51 @@ export default {
         // 开启宽度和高度比例
         fixed: true,
         fixedNumber: [1, 1]
+      },
+      submitting: false,
+      form: {
+        nickName: '',
+        introduction: '',
+        email: ''
+      },
+      rules: {
+        nickName: [{ max: 10, message: '请输入10字以内。', trigger: 'change' }],
+        introduction: [{ max: 80, message: '请输入80字以内。', trigger: 'change' }],
+        email: [{ validator: validateEmail, trigger: 'change' }]
       }
     }
   },
   methods: {
-    setavatar (url) {
+    setAvatar (url) {
       this.option.img = url
+    },
+    onSubmit () {
+      this.$refs.form.validate(valid => {
+        if (valid) {
+          this.updateInfo(this.form)
+        } else {
+          return false
+        }
+      })
+    },
+    updateInfo (info) {
+      this.submitting = true
+      updateUserInfo(info).then(res => {
+        this.submitting = false
+        if (res.head && res.head.respCode === 200) {
+          this.$notification.success({
+            message: 'success',
+            description: `基本信息更新成功！`
+          })
+          this.$store.dispatch('GetInfo').catch(e => {
+            this.$message.error('获取用户信息失败，请重新刷新页面！')
+          })
+        } else {
+          this.$message.error(res.head.respMsg)
+        }
+      }).catch(e => {
+        this.submitting = false
+      })
     }
   }
 }

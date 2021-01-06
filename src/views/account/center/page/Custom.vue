@@ -12,7 +12,7 @@
         </template>
       </a-list-item-meta>
       <template v-slot:actions>
-        <a-switch checkedChildren="暗色" unCheckedChildren="白色" :defaultChecked="navTheme === 'light' && true || false" @change="onChange" />
+        <a-switch checkedChildren="暗色" unCheckedChildren="白色" :defaultChecked="navTheme === 'light' && true || false" @change="onChange" :disabled="true"/>
       </template>
     </a-list-item>
     <a-list-item>

@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 
-const userApi = {
+const accountApi = {
   Initial: '/login/initial',
   Login: '/login/login',
   Logout: '/login/logout',
@@ -20,7 +20,7 @@ const userApi = {
  */
 export function initial (parameter) {
   return request({
-    url: userApi.Initial,
+    url: accountApi.Initial,
     method: 'post',
     data: parameter
   })
@@ -39,7 +39,7 @@ export function initial (parameter) {
  */
 export function login (parameter) {
   return request({
-    url: userApi.Login,
+    url: accountApi.Login,
     method: 'post',
     data: parameter
   })
@@ -47,32 +47,15 @@ export function login (parameter) {
 
 export function getSmsCaptcha (parameter) {
   return request({
-    url: userApi.SendSms,
+    url: accountApi.SendSms,
     method: 'post',
     data: parameter
   })
 }
 
-export function getInfo () {
-  return request({
-    url: userApi.UserInfo,
-    method: 'get',
-    headers: {
-      'Content-Type': 'application/json;charset=UTF-8'
-    }
-  })
-}
-
-export function getCurrentUserNav () {
-  return request({
-    url: userApi.UserMenu,
-    method: 'get'
-  })
-}
-
 export function logout () {
   return request({
-    url: userApi.Logout,
+    url: accountApi.Logout,
     method: 'post',
     headers: {
       'Content-Type': 'application/json;charset=UTF-8'
@@ -86,7 +69,7 @@ export function logout () {
  */
 export function get2step (parameter) {
   return request({
-    url: userApi.twoStepCode,
+    url: accountApi.twoStepCode,
     method: 'post',
     data: parameter
   })

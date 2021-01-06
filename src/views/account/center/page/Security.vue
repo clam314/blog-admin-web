@@ -42,7 +42,7 @@ export default {
       if (index === 0) {
         return { description: '当前密码强度: ', value: '强' }
       } else if (index === 1) {
-        const tel = this.userInfo.tel
+        const tel = this.userInfo.telephone
         if (tel) {
           return { description: '已绑定手机: ', value: String(tel).replace(/^(\d{3})\d{4}(\d{4})$/, '$1****$2') }
         } else {
