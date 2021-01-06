@@ -8,19 +8,17 @@
               <img :src="avatar">
             </div>
             <div class="username">{{ nickname }}</div>
-            <div class="bio">海纳百川，有容乃大</div>
+            <div class="bio" v-if="userInfo.introduction">{{ userInfo.introduction }}</div>
           </div>
           <div class="account-center-detail">
-            <p>
-              <i class="title"></i>交互专家
+            <p v-if="userInfo.email">
+              <a-icon type="mail"/>{{ userInfo.email }}
             </p>
-            <p>
-              <i class="group"></i>某某平台部－某某技术部－UED
+            <p v-if="userInfo.lastLoginIp">
+              <a-icon type="global"/>{{ userInfo.lastLoginIp }}
             </p>
-            <p>
-              <i class="address"></i>
-              <span>广东省</span>
-              <span>广州市</span>
+            <p v-if="userInfo.lastLoginTime">
+              <a-icon type="history"/>{{ Number(userInfo.lastLoginTime) | moment }}
             </p>
           </div>
           <a-divider/>
@@ -28,18 +26,18 @@
           <div class="account-center-tags">
             <div class="tagsTitle">标签</div>
             <a-spin :spinning="tagsSpinning">
-              <template v-for="(tag, index) in tags">
+              <template v-for="tag in tags">
                 <a-tooltip v-if="tag.length > 20" :key="tag" :title="tag">
                   <a-tag
                     :key="tag"
-                    :closable="index !== 0"
+                    :closable="true"
                     :close="() => handleTagClose(tag)"
                   >{{ `${tag.slice(0, 20)}...` }}</a-tag>
                 </a-tooltip>
                 <a-tag
                   v-else
                   :key="tag"
-                  :closable="index !== 0"
+                  :closable="true"
                   :close="() => handleTagClose(tag)"
                 >{{ tag }}</a-tag>
               </template>
@@ -130,10 +128,12 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['nickname', 'avatar'])
+    ...mapGetters(['nickname', 'avatar', 'userInfo'])
   },
   mounted () {
-    this.getTags()
+    // this.getTags()
+    this.tags = this.userInfo.tags
+    this.tagsSpinning = false
   },
   methods: {
     getTags () {
@@ -225,7 +225,6 @@ export default {
       width: 14px;
       left: 0;
       top: 4px;
-      background: url(https://gw.alipayobjects.com/zos/rmsportal/pBjWzVAHnOOtAUvZmZfy.svg);
     }
 
     .title {
