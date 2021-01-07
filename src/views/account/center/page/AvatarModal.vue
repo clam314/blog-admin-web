@@ -13,6 +13,7 @@
         <vue-cropper
           ref="cropper"
           :img="options.img"
+          :output-type="options.outputType"
           :info="true"
           :autoCrop="options.autoCrop"
           :autoCropWidth="options.autoCropWidth"
@@ -31,7 +32,7 @@
     <br>
     <a-row>
       <a-col :lg="2" :md="2">
-        <a-upload name="file" :beforeUpload="beforeUpload" :showUploadList="false">
+        <a-upload name="file" :accept="acceptType" :beforeUpload="beforeUpload" :showUploadList="false">
           <a-button icon="upload">选择图片</a-button>
         </a-upload>
       </a-col>
@@ -55,6 +56,8 @@
 
 </template>
 <script>
+import { updateAvatar } from '@/api/user'
+
 export default {
   data () {
     return {
@@ -63,9 +66,10 @@ export default {
       confirmLoading: false,
       fileList: [],
       uploading: false,
+      acceptType: '.jpg, .jpeg, .png, .gif',
       options: {
-        // img: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
         img: '',
+        outputType: 'png',
         autoCrop: true,
         autoCropWidth: 200,
         autoCropHeight: 200,
@@ -98,6 +102,7 @@ export default {
       this.$refs.cropper.rotateRight()
     },
     beforeUpload (file) {
+      this.fileName = file.name
       const reader = new FileReader()
       // 把Array Buffer转化为blob 如果是base64不需要
       // 转化为base64
@@ -107,7 +112,6 @@ export default {
       }
       // 转化为blob
       // reader.readAsArrayBuffer(file)
-
       return false
     },
 
@@ -123,21 +127,19 @@ export default {
           this.model = true
           this.modelSrc = img
           formData.append('file', data, this.fileName)
-          this.$http.post('https://www.mocky.io/v2/5cc8019d300000980a055e76', formData, { contentType: false, processData: false, headers: { 'Content-Type': 'application/x-www-form-urlencoded' } })
-            .then((response) => {
-              console.log('upload response:', response)
-              // var res = response.data
-              // if (response.status === 'done') {
-              //   _this.imgFile = ''
-              //   _this.headImg = res.realPathList[0] // 完整路径
-              //   _this.uploadImgRelaPath = res.relaPathList[0] // 非完整路径
-              //   _this.$message.success('上传成功')
-              //   this.visible = false
-              // }
+          updateAvatar(formData).then(res => {
+            console.log('upload response:', res)
+            if (res.head && res.head.respCode === 200) {
               _this.$message.success('上传成功')
-              _this.$emit('ok', response.url)
+              _this.$emit('ok', res.result.url)
               _this.visible = false
-            })
+              this.$store.dispatch('GetInfo').catch(e => {
+                this.$message.error('获取用户信息失败，请刷新页面或稍后重试！')
+              })
+            } else {
+              this.$message.error(res.head.respMsg)
+            }
+          })
         })
       } else {
         this.$refs.cropper.getCropData((data) => {

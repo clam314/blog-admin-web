@@ -4,6 +4,7 @@ const userApi = {
   UserInfo: '/user/info',
   UserInfoUpdate: '/user/update',
   UserTags: '/user/updateTags',
+  UserAvatarUpdate: '/user/avatar',
   UserMenu: '/user/nav'
 }
 
@@ -30,6 +31,17 @@ export function updateUserTags (parameter) {
     url: userApi.UserTags,
     method: 'post',
     data: parameter
+  })
+}
+
+export function updateAvatar (parameter) {
+  return request({
+    url: userApi.UserAvatarUpdate,
+    method: 'post',
+    data: parameter,
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
   })
 }
 

@@ -33,7 +33,7 @@
           <div class="mask">
             <a-icon type="plus" />
           </div>
-          <img :src="option.img"/>
+          <img :src="avatar"/>
         </div>
       </a-col>
 
@@ -88,9 +88,19 @@ export default {
       }
     }
   },
+  computed: {
+    avatar: {
+      get () {
+        return this.$store.getters.avatar
+      },
+      set (val) {
+        this.$store.commit('SET_AVATAR', val)
+      }
+    }
+  },
   methods: {
     setAvatar (url) {
-      this.option.img = url
+      this.avatar = url
     },
     onSubmit () {
       this.$refs.form.validate(valid => {
