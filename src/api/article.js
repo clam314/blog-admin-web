@@ -3,9 +3,7 @@ import request from '@/utils/request'
 const articleApi = {
   GetArticles: '/article/list',
   AddArticle: '/article/add',
-  MdArticleList: '/list/articles/md',
-  GetMdArticle: '/article/markdown/',
-  SaveMdArticle: '/article/markdown',
+  SaveArticle: '/article/updateContent',
   UpdateMdStatus: '/article/markdown/status',
   DelMdArticle: '/article/markdown/'
 }
@@ -29,6 +27,7 @@ export function getArticles (parameter) {
   })
 }
 
+// 创建文档
 export function addArticle (parameter) {
   return request({
     url: articleApi.AddArticle,
@@ -37,32 +36,15 @@ export function addArticle (parameter) {
   })
 }
 
-export function getMarkdownArticles () {
+// 保存文档
+export function saveArticle (parameter) {
   return request({
-    url: articleApi.MdArticleList,
-    method: 'post'
-  })
-}
-
-export function getMarkdownArticle (documentId) {
-  return request({
-    url: articleApi.GetMdArticle + documentId,
-    method: 'get'
-  })
-}
-
-export function saveMarkdownArticle (parameter) {
-  return request({
-    url: articleApi.SaveMdArticle,
+    url: articleApi.SaveArticle,
     method: 'post',
     data: parameter
   })
 }
 
-/**
- * 发布/取消发布
- * @param parameter
- */
 export function updateStatus (parameter) {
   return request({
     url: articleApi.UpdateMdStatus,

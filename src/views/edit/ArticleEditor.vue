@@ -36,7 +36,7 @@
 
 <script>
 import { uploadImg } from '@/api/articleImg'
-import { getMarkdownArticle, saveMarkdownArticle } from '@/api/article'
+import { saveArticle } from '@/api/article'
 import defaultSettings from '@/config/defaultSettings'
 import ArticleStatusDrawer from '@/views/edit/ArticleStatusDrawer'
 
@@ -58,7 +58,6 @@ export default {
   data () {
     return {
       spinning: true,
-      local: true, // true-文档来源是本地，false-来源网络需要请求
       markdown: {
         codeStyle: 'atom-one-dark',
         editorBackground: '#fafafa',
@@ -98,6 +97,7 @@ export default {
       },
       markdownForm: {
         articleId: null,
+        folderId: null,
         title: defaultTitle,
         contentMarkdown: '',
         contentHtml: '',
@@ -114,11 +114,6 @@ export default {
       infoDrawer: {
         visible: false
       }
-    }
-  },
-  created () {
-    if (!this.local) {
-      this.getArticle()
     }
   },
   mounted () {
@@ -150,26 +145,21 @@ export default {
       }
       this.spinning = false
     },
-    getArticle () { // 获取文章内容
-      const id = this.$route.query.a
-      if (id == null) {
-        this.markdownForm.contentMarkdown = ''
-      } else {
-        getMarkdownArticle(id).then(r => {
-          this.markdownForm.contentMarkdown = r.data.contentMarkdown == null ? '' : r.data.contentMarkdown
-          this.markdownForm.articleId = r.data.articleId
-          this.markdownForm.title = r.data.title
-          this.markdownForm.type = r.data.type
-        }).catch(e => {
-          console.log(e)
-        })
+    save (value, render, auto = false) { // 保存文章内容
+      const param = {
+        tid: this.markdownForm.articleId,
+        title: this.markdownForm.title,
+        contentMd: this.markdownForm.contentMarkdown,
+        contentHtml: this.markdownForm.contentHtml
       }
-    },
-    save () { // 保存文章内容
-      saveMarkdownArticle(this.markdownForm).then(r => {
-        this.$message.success('保存成功')
-        this.markdownForm.articleId = r.data.articleId
-        this.lastSaveTime = new Date()
+      saveArticle(param).then(res => {
+        if (res.head && res.head.respCode === 200) {
+          this.$message.success(auto ? '自动保存成功' : '保存成功')
+          this.markdownForm.articleId = res.result.article.tid
+          this.lastSaveTime = new Date()
+        } else {
+          this.$message.error(res.head.respMsg)
+        }
       }).catch(e => {
         console.log(e)
       })
@@ -177,12 +167,7 @@ export default {
     intervalSave () { // 自动保存
       const now = new Date()
       if (now - this.lastSaveTime >= 2 * 60 * 1000) {
-        saveMarkdownArticle(this.markdownForm).then(r => {
-          this.$message.success('自动保存成功')
-          this.lastSaveTime = new Date()
-        }).catch(e => {
-          console.log(e)
-        })
+        this.save('', '', true)
       }
     },
     imgFilter (file) {
