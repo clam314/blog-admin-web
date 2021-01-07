@@ -26,17 +26,17 @@
           <div class="account-center-tags">
             <div class="tagsTitle">标签</div>
             <a-spin :spinning="tagsSpinning">
-              <template v-for="tag in tags">
-                <a-tooltip v-if="tag.length > 20" :key="tag" :title="tag">
+              <template v-for="(tag, index) in tags">
+                <a-tooltip v-if="tag.length > 20" :key="index +String(tagsKey)" :title="tag">
                   <a-tag
-                    :key="tag"
+                    :key="index +String(tagsKey)"
                     :closable="true"
                     @close="() => handleTagClose(tag)"
                   >{{ `${tag.slice(0, 20)}...` }}</a-tag>
                 </a-tooltip>
                 <a-tag
                   v-else
-                  :key="tag"
+                  :key="index +String(tagsKey)"
                   :closable="true"
                   @close="() => handleTagClose(tag)"
                 >{{ tag }}</a-tag>
@@ -96,6 +96,7 @@ export default {
   },
   data () {
     return {
+      tagsKey: 0,
       tagsSpinning: false,
       tagInputVisible: false,
       tagInputValue: '',
@@ -145,7 +146,9 @@ export default {
     handleTagClose (removeTag) {
      this.updateTags(removeTag, true, (rTag) => {
         this.tags = this.tags.filter(tag => tag !== rTag)
-      })
+      }, () => {
+       this.tagsKey = new Date().getTime() // 标签关闭在网络请求前，失败后需要重新显示
+     })
     },
 
     showTagInput () {
