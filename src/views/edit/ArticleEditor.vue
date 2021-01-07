@@ -17,11 +17,14 @@
           @save="save"
           @imgAdd="imgAdd"
           @imgDel="imgDel"
+          @change="editorChange"
           v-model="markdownForm.contentMarkdown"
+          :imageFilter="imgFilter"
           :codeStyle="markdown.codeStyle"
           :toolbars="markdown.toolbars"
           :toolbarsBackground="markdown.toolbarsBackground"
           :editorBackground="markdown.editorBackground"
+          :ishljs="true"
           :style="{backgroundColor: markdown.editorBackground}"
           :previewBackground="markdown.previewBackground"
         />
@@ -97,7 +100,7 @@ export default {
         articleId: null,
         title: defaultTitle,
         contentMarkdown: '',
-        contentHtml: null,
+        contentHtml: '',
         type: 0
       },
       rules: {
@@ -182,13 +185,27 @@ export default {
         })
       }
     },
+    imgFilter (file) {
+      console.log(file)
+      try {
+        const ext = file.name.split('.').pop().toLowerCase()
+        return ['jpg', 'jpeg', 'png', 'gif'].includes(ext)
+      } catch (e) {
+        console.log(e)
+        return false
+      }
+    },
     imgAdd (pos, file) { // 添加图片，pos为位置
-      const markdownImg = {}; const $vm = this.$refs.md
-      markdownImg.base64Data = file.miniurl // 获取图片base64内容
-      markdownImg.type = file.type
-      uploadImg(markdownImg).then(r => {
-        console.log(r)
-        $vm.$img2Url(pos, process.env.VUE_APP_BASE_API + '/img/' + r.data)
+      const $vm = this.$refs.md
+      const formData = new FormData()
+      formData.append('file', file)
+      uploadImg(formData).then(res => {
+        console.log('upload response:', res)
+        if (res.head && res.head.respCode === 200) {
+          $vm.$img2Url(pos, res.result.url)
+        } else {
+          this.$message.error(res.head.respMsg)
+        }
       }).catch(e => {
         console.log(e)
       })
@@ -197,12 +214,11 @@ export default {
       console.log(pos)
       console.log(url)
     },
+    editorChange (value, render) {
+      this.markdownForm.contentHtml = render
+    },
     deleteArticle () {
-      if (this.markdownFile) {
-        console.log(...this.markdownFile)
-      } else {
-        this.$message.error('文件信息为空，无法删除！')
-      }
+      this.$message.info('该功能暂时未开放')
     },
     openInfoDrawer () {
       this.$refs.aStatus.openInfoDrawer()

@@ -7,7 +7,10 @@ const imgApi = {
 export function uploadImg (parameter) {
   return request({
     url: imgApi.UploadImg,
-    method: 'put',
-    data: parameter
+    method: 'post',
+    data: parameter,
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
   })
 }
