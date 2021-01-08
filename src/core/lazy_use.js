@@ -2,7 +2,7 @@ import Vue from 'vue'
 
 // base library
 import {
-  ConfigProvider,
+  // ConfigProvider,
   Layout,
   Input,
   InputNumber,
@@ -16,16 +16,16 @@ import {
   Row,
   Col,
   Modal,
-  Table,
+  // Table,
   Tabs,
   Icon,
-  Badge,
-  Popover,
+  // Badge,
+  // Popover,
   Dropdown,
   List,
   Avatar,
-  Breadcrumb,
-  Steps,
+  // Breadcrumb,
+  // Steps,
   Spin,
   Menu,
   Drawer,
@@ -33,16 +33,16 @@ import {
   Alert,
   Tag,
   Divider,
-  DatePicker,
-  TimePicker,
+  // DatePicker,
+  // TimePicker,
   Upload,
   Progress,
   Skeleton,
-  Popconfirm,
+  // Popconfirm,
   PageHeader,
   Result,
   Statistic,
-  Descriptions,
+  // Descriptions,
   Space,
   message,
   notification
@@ -57,7 +57,7 @@ import PageLoading from '@/components/PageLoading'
 import PermissionHelper from '@/core/permission/permission'
 import './directives/action'
 
-Vue.use(ConfigProvider)
+// Vue.use(ConfigProvider)
 Vue.use(Layout)
 Vue.use(Input)
 Vue.use(InputNumber)
@@ -71,16 +71,16 @@ Vue.use(Form)
 Vue.use(Row)
 Vue.use(Col)
 Vue.use(Modal)
-Vue.use(Table)
+// Vue.use(Table)
 Vue.use(Tabs)
 Vue.use(Icon)
-Vue.use(Badge)
-Vue.use(Popover)
+// Vue.use(Badge)
+// Vue.use(Popover)
 Vue.use(Dropdown)
 Vue.use(List)
 Vue.use(Avatar)
-Vue.use(Breadcrumb)
-Vue.use(Steps)
+// Vue.use(Breadcrumb)
+// Vue.use(Steps)
 Vue.use(Spin)
 Vue.use(Menu)
 Vue.use(Drawer)
@@ -88,16 +88,16 @@ Vue.use(Tooltip)
 Vue.use(Alert)
 Vue.use(Tag)
 Vue.use(Divider)
-Vue.use(DatePicker)
-Vue.use(TimePicker)
+// Vue.use(DatePicker)
+// Vue.use(TimePicker)
 Vue.use(Upload)
 Vue.use(Progress)
 Vue.use(Skeleton)
-Vue.use(Popconfirm)
+// Vue.use(Popconfirm)
 Vue.use(PageHeader)
 Vue.use(Result)
 Vue.use(Statistic)
-Vue.use(Descriptions)
+// Vue.use(Descriptions)
 Vue.use(Space)
 
 Vue.prototype.$confirm = Modal.confirm

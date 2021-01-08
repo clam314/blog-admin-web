@@ -26,45 +26,11 @@ export const asyncRouterMap = [
           {
             path: '/dashboard/analysis/:pageNo([1-9]\\d*)?',
             name: 'Analysis',
-            component: () => import('@/views/dashboard/Analysis'),
+            component: () => import(/* webpackChunkName: "dashboard" */ '@/views/dashboard/Analysis'),
             meta: { title: 'menu.dashboard.analysis', keepAlive: false, permission: ['dashboard'] }
           }
         ]
       },
-      // list
-      // {
-      //   path: '/list',
-      //   name: 'list',
-      //   component: RouteView,
-      //   redirect: '/list/search/article',
-      //   hideChildrenInMenu: true,
-      //   meta: { title: 'menu.list', icon: 'table', permission: ['table'] },
-      //   children: [
-      //     {
-      //       path: '/list/search',
-      //       name: 'SearchList',
-      //       component: () => import('@/views/list/search/SearchLayout'),
-      //       redirect: '/list/search/article',
-      //       meta: { title: 'menu.list.search-list', keepAlive: true, permission: ['table'] },
-      //       children: [
-      //         {
-      //           path: '/list/search/article',
-      //           name: 'SearchArticles',
-      //           component: () => import('../views/list/search/Article'),
-      //           meta: { title: 'menu.list.search-list.articles', permission: ['table'] }
-      //         },
-      //         {
-      //           path: '/list/search/project',
-      //           name: 'SearchProjects',
-      //           component: () => import('../views/list/search/Projects'),
-      //           meta: { title: 'menu.list.search-list.projects', permission: ['table'] }
-      //         }
-      //       ]
-      //     }
-      //   ]
-      // },
-
-      //
       {
         path: '/article',
         redirect: '/edit',
@@ -84,7 +50,7 @@ export const asyncRouterMap = [
           {
             path: '/account/center',
             name: 'center',
-            component: () => import('@/views/account/center'),
+            component: () => import(/* webpackChunkName: "account" */ '@/views/account/center'),
             meta: { title: 'menu.account.center', keepAlive: true, permission: ['user'] }
           }
         ]
@@ -93,7 +59,7 @@ export const asyncRouterMap = [
   },
   {
     path: '/edit',
-    component: () => import(/* webpackChunkName: "fail" */ '@/views/edit'),
+    component: () => import(/* webpackChunkName: "edit" */ '@/views/edit'),
     name: 'Edit',
     meta: { title: '文章编辑', icon: 'user', keepAlive: true, permission: ['user'] }
   },

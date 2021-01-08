@@ -4,6 +4,7 @@ const GitRevisionPlugin = require('git-revision-webpack-plugin')
 const GitRevision = new GitRevisionPlugin()
 const buildDate = JSON.stringify(new Date().toLocaleString())
 const createThemeColorReplacerPlugin = require('./config/plugin.config')
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
 function resolve (dir) {
   return path.join(__dirname, dir)
@@ -39,7 +40,8 @@ const assetsCDN = {
 
 // vue.config.js
 const vueConfig = {
-  // publicPath: process.env.NODE_ENV === 'production' ? '/blog-admin-web/' : '/',
+  publicPath: process.env.NODE_ENV === 'production' ? '/blog-admin-web/' : '/',
+  // publicPath: '/',
   configureWebpack: {
     // webpack plugins
     plugins: [
@@ -49,7 +51,9 @@ const vueConfig = {
         APP_VERSION: `"${require('./package.json').version}"`,
         GIT_HASH: JSON.stringify(getGitHash()),
         BUILD_DATE: buildDate
-      })
+      }),
+      // 依赖大小分析工具
+      new BundleAnalyzerPlugin()
     ],
     // if prod, add externals
     externals: isProd ? assetsCDN.externals : {}
@@ -114,7 +118,7 @@ const vueConfig = {
     }
   },
 
-  // disable source map in production
+  // 是否在构建生产包时生成 sourceMap 文件，false将提高构建速度
   productionSourceMap: false,
   lintOnSave: undefined,
   // babel-loader no-ignore node_modules/*
