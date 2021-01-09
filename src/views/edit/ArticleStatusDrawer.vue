@@ -133,9 +133,11 @@
   </a-drawer>
 </template>
 <script>
+import { updateArticleInfo, updateArticleTags } from '@/api/article'
 import Vue from 'vue'
 import { FormModel } from 'ant-design-vue'
 import TagSelectOption from '@/components/TagSelect/TagSelectOption'
+
 Vue.use(FormModel)
 
 export default {
@@ -227,19 +229,10 @@ export default {
     onSubmit () {
       this.$refs.ruleForm.validate(valid => {
         if (valid) {
-          alert('submit!')
+          updateArticleInfo()
         } else {
-          console.log('error submit!!')
           return false
         }
-      })
-    },
-
-    getTags () {
-      this.$http.get('/api/user/tags').then(res => {
-        console.log(res)
-        this.tags = res.result
-        this.tagsSpinning = false
       })
     },
     handleTagClose (removeTag) {
@@ -255,15 +248,36 @@ export default {
       this.tagInputValue = e.target.value
     },
     handleTagInputConfirm () {
-      const inputValue = this.tagInputValue
-      let tags = this.tags
-      if (inputValue && !tags.includes(inputValue)) {
-        tags = [...tags, inputValue]
+      const reset = () => {
+        this.tagInputVisible = false
+        this.tagInputValue = ''
       }
-      Object.assign(this, {
-        tags,
-        tagInputVisible: false,
-        tagInputValue: ''
+      if (this.tagInputValue && !this.tags.includes(this.tagInputValue)) {
+        this.updateTags(this.tagInputValue, false, (newTag) => {
+          this.tags = [...this.tags, newTag]
+        }, reset)
+      } else {
+        reset()
+      }
+    },
+    updateTags (tag, isDelete, callback, reset = () => {}) {
+      if (!tag || tag === '') {
+        reset()
+        return
+      }
+      this.tagsSpinning = true
+      updateArticleTags({ tag, isDelete }).then(res => {
+        this.tagsSpinning = false
+        if (res.head && res.head.respCode === 200) {
+          callback(tag, isDelete)
+        } else {
+          this.$message.error(res.head.respMsg)
+        }
+        reset()
+      }).catch(e => {
+        reset()
+        this.tagsSpinning = false
+        this.$message.error('更新标签，请刷新页面或稍后重试！')
       })
     }
   }

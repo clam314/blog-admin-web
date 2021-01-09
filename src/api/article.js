@@ -4,8 +4,8 @@ const articleApi = {
   GetArticles: '/article/list',
   AddArticle: '/article/add',
   SaveArticle: '/article/updateContent',
-  UpdateMdStatus: '/article/markdown/status',
-  DelMdArticle: '/article/markdown/'
+  UpdateTags: '/article/updateTags',
+  UpdateInfo: '/article/updateInfo'
 }
 
 /**
@@ -45,22 +45,20 @@ export function saveArticle (parameter) {
   })
 }
 
-export function updateStatus (parameter) {
+// 修改文档标签
+export function updateArticleTags (parameter) {
   return request({
-    url: articleApi.UpdateMdStatus,
+    url: articleApi.UpdateTags,
     method: 'post',
     data: parameter
   })
 }
 
-/**
- * 删除
- * @param parameter
- */
-export function del (parameter) {
+// 更新文档信息或状态
+export function updateArticleInfo (parameter) {
   return request({
-    url: articleApi.DelMdArticle,
-    method: 'delete',
+    url: articleApi.UpdateInfo,
+    method: 'post',
     data: parameter
   })
 }
