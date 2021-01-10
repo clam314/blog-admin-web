@@ -2,7 +2,7 @@ import Vue from 'vue'
 
 // base library
 import {
-  // ConfigProvider,
+  ConfigProvider,
   Layout,
   Input,
   InputNumber,
@@ -19,7 +19,7 @@ import {
   // Table,
   Tabs,
   Icon,
-  // Badge,
+  Badge,
   // Popover,
   Dropdown,
   List,
@@ -33,7 +33,7 @@ import {
   Alert,
   Tag,
   Divider,
-  // DatePicker,
+  DatePicker,
   // TimePicker,
   Upload,
   Progress,
@@ -57,7 +57,7 @@ import PageLoading from '@/components/PageLoading'
 import PermissionHelper from '@/core/permission/permission'
 import './directives/action'
 
-// Vue.use(ConfigProvider)
+Vue.use(ConfigProvider)
 Vue.use(Layout)
 Vue.use(Input)
 Vue.use(InputNumber)
@@ -74,7 +74,7 @@ Vue.use(Modal)
 // Vue.use(Table)
 Vue.use(Tabs)
 Vue.use(Icon)
-// Vue.use(Badge)
+Vue.use(Badge)
 // Vue.use(Popover)
 Vue.use(Dropdown)
 Vue.use(List)
@@ -88,7 +88,7 @@ Vue.use(Tooltip)
 Vue.use(Alert)
 Vue.use(Tag)
 Vue.use(Divider)
-// Vue.use(DatePicker)
+Vue.use(DatePicker)
 // Vue.use(TimePicker)
 Vue.use(Upload)
 Vue.use(Progress)

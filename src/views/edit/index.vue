@@ -51,11 +51,11 @@
           <a-icon type="file-add" style="font-size: 16px;"/>
           <span :class="!collapsedArticleList ? 'article-list-wrapper-text':'article-list-wrapper-text-collapsed'">新建文档</span>
         </div>
-        <article-menu-list :collapsed="collapsedArticleList" :folder="selectedFolder" @changeSelect="onSelected"/>
+        <article-menu-list ref="articleList" :collapsed="collapsedArticleList" :folder="selectedFolder" @changeSelect="onSelected"/>
       </a-layout-sider>
 
       <a-layout-content style="margin: 0 0; width: 100% ;height: 100%;max-height: 100%">
-        <article-editor class="article-editor" :article="selectedArticle" :folders="folders"/>
+        <article-editor class="article-editor" :article="selectedArticle" :folders="folders" @update="handleArticleInfoUpdate" />
       </a-layout-content>
     </a-layout>
     <a-modal
@@ -217,6 +217,20 @@ export default {
           return false
         }
       })
+    },
+    handleArticleInfoUpdate (newArticle, newFolderId) {
+      console.log('handleArticleInfoUpdate ', newArticle.title, '  ', newFolderId)
+      this.selectedArticle = newArticle
+      this.$refs.articleList.changeSelectedArticle(newArticle)
+      if (this.selectedFolder.fid !== newFolderId) {
+        for (const item of this.folders) {
+          if (item.fid === newFolderId) {
+            this.selectedFolder = item
+            this.selectedKeys = [item.fid]
+            return
+          }
+        }
+      }
     }
   },
   computed: {

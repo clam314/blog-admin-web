@@ -29,7 +29,7 @@
           :previewBackground="markdown.previewBackground"
         />
       </a-layout-content>
-      <article-status-drawer ref="aStatus" :article="article" :folders="folders"/>
+      <article-status-drawer ref="aStatus" :article="article" :folders="folders" @update="handleArticleUpdate"/>
     </a-layout>
   </a-spin>
 </template>
@@ -110,10 +110,7 @@ export default {
         ]
       },
       lastSaveTime: null,
-      timer: null,
-      infoDrawer: {
-        visible: false
-      }
+      timer: null
     }
   },
   mounted () {
@@ -155,7 +152,9 @@ export default {
       saveArticle(param).then(res => {
         if (res.head && res.head.respCode === 200) {
           this.$message.success(auto ? '自动保存成功' : '保存成功')
-          this.markdownForm.articleId = res.result.article.tid
+          const resultA = res.result.article
+          this.markdownForm.articleId = resultA.tid
+          this.handleArticleUpdate(resultA, resultA.fid)
           this.lastSaveTime = new Date()
         } else {
           this.$message.error(res.head.respMsg)
@@ -185,7 +184,6 @@ export default {
       const formData = new FormData()
       formData.append('file', file)
       uploadImg(formData).then(res => {
-        console.log('upload response:', res)
         if (res.head && res.head.respCode === 200) {
           $vm.$img2Url(pos, res.result.url)
         } else {
@@ -207,6 +205,9 @@ export default {
     },
     openInfoDrawer () {
       this.$refs.aStatus.openInfoDrawer()
+    },
+    handleArticleUpdate (newArticle, folderId) {
+      this.$emit('update', newArticle, folderId)
     }
   }
 }

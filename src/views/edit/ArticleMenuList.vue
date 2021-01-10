@@ -13,10 +13,10 @@
     >
       <a-list-item
         slot="renderItem"
-        slot-scope="item"
+        slot-scope="item, index"
         class="list-item"
         :class="{'list-item-selected' : item===selectedItem}"
-        @click="() => {onSelectChange(item)}">
+        @click="() => {onSelectChange(index, item)}">
         <div class="list-item-content" >
           <a-list-item-meta>
             <a slot="title" class="list-title" :class="!collapsed? 'list-title-normal' : 'list-title-collapsed'">{{ item.title }}</a>
@@ -67,6 +67,7 @@ export default {
       busy: false,
       pageNum: 0,
       pageCount: 15,
+      selectedIndex: 0,
       selectedItem: null,
       iconColor: defaultSettings.primaryColor,
       data: []
@@ -84,7 +85,7 @@ export default {
         this.getData(res => {
           if (res.result.list.length > 0) {
             this.data = res.result.list
-            this.onSelectChange(this.data[0])
+            this.onSelectChange(0, this.data[0])
           }
         })
       }
@@ -129,12 +130,18 @@ export default {
         }
       )
     },
-    onSelectChange (item) {
+    onSelectChange (index, item) {
+      this.selectedIndex = index
       this.selectedItem = item
       this.$emit('changeSelect', item)
     },
     fileIcon (filePath) {
       return getFileTypeForIcon(filePath)
+    },
+    changeSelectedArticle (newArticle) {
+      console.log('changeSelectedArticle')
+      this.selectedItem = newArticle
+      this.data[this.selectedIndex] = this.selectedItem
     }
   }
 }

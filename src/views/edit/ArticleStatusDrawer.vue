@@ -97,21 +97,21 @@
     </a-divider>
     <div class="account-center-tags" style="padding: 0 10px">
       <a-spin :spinning="tagsSpinning" >
-        <template v-for="tag in tags" >
-          <a-tooltip v-if="tag.length > 20" :key="tag" :title="tag">
+        <template v-for="(tag, index) in tags" >
+          <a-tooltip v-if="tag.length > 20" :key="index +String(tagsKey)" :title="tag">
             <a-tag
               style="margin-bottom: 10px"
-              :key="tag"
+              :key="index +String(tagsKey)"
               :closable="true"
-              :close="() => handleTagClose(tag)"
+              @close="() => handleTagClose(tag)"
             >{{ `${tag.slice(0, 20)}...` }}</a-tag>
           </a-tooltip>
           <a-tag
             v-else
             style="margin-bottom: 10px"
-            :key="tag"
+            :key="index +String(tagsKey)"
             :closable="true"
-            :close="() => handleTagClose(tag)"
+            @close="() => handleTagClose(tag)"
           >{{ tag }}</a-tag>
         </template>
         <a-input
@@ -181,9 +181,9 @@ export default {
         desc: [{ max: 200, message: '简单描述文章内容，请输入200字以内。', trigger: 'blur' }]
       },
 
+      tagsKey: 0,
       tags: [],
-      tagsSpinning: true,
-
+      tagsSpinning: false,
       tagInputVisible: false,
       tagInputValue: ''
     }
@@ -229,14 +229,39 @@ export default {
     onSubmit () {
       this.$refs.ruleForm.validate(valid => {
         if (valid) {
-          updateArticleInfo()
+          const param = {
+            tid: this.article.tid,
+            fid: this.article.fid,
+            newFid: this.form.folderId,
+            published: this.form.publish ? 1 : 0,
+            status: this.form.status,
+            description: this.form.desc
+          }
+          this.preparingForm = true
+          const oldFid = this.article.fid
+          updateArticleInfo(param).then(res => {
+            if (res.head && res.head.respCode === 200) {
+              this.drawerVisible = oldFid === res.result.article.fid
+              this.$emit('update', res.result.article, res.result.article.fid)
+            } else {
+              this.$message.error(res.head.respMsg)
+            }
+            this.preparingForm = false
+          }).catch(e => {
+            this.preparingForm = false
+          })
         } else {
           return false
         }
       })
     },
     handleTagClose (removeTag) {
-      this.tags = this.tags.filter(tag => tag !== removeTag)
+      this.updateTags(this.article.tid, removeTag, true, (rTag) => {
+        this.tags = this.tags.filter(tag => tag !== rTag)
+        this.article.tags = this.tags
+      }, () => {
+        this.tagsKey = new Date().getTime() // 标签关闭在网络请求前，失败后需要重新显示
+      })
     },
     showTagInput () {
       this.tagInputVisible = true
@@ -253,20 +278,21 @@ export default {
         this.tagInputValue = ''
       }
       if (this.tagInputValue && !this.tags.includes(this.tagInputValue)) {
-        this.updateTags(this.tagInputValue, false, (newTag) => {
+        this.updateTags(this.article.tid, this.tagInputValue, false, (newTag) => {
           this.tags = [...this.tags, newTag]
+          this.article.tags = this.tags
         }, reset)
       } else {
         reset()
       }
     },
-    updateTags (tag, isDelete, callback, reset = () => {}) {
-      if (!tag || tag === '') {
+    updateTags (tid, tag, isDelete, callback, reset = () => {}) {
+      if (!tid || !tag || tag === '') {
         reset()
         return
       }
       this.tagsSpinning = true
-      updateArticleTags({ tag, isDelete }).then(res => {
+      updateArticleTags({ tid, tag, isDelete }).then(res => {
         this.tagsSpinning = false
         if (res.head && res.head.respCode === 200) {
           callback(tag, isDelete)

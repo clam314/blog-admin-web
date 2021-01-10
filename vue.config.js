@@ -5,6 +5,10 @@ const GitRevision = new GitRevisionPlugin()
 const buildDate = JSON.stringify(new Date().toLocaleString())
 const createThemeColorReplacerPlugin = require('./config/plugin.config')
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
+const CompressionWebpackPlugin = require('compression-webpack-plugin')
+
+// 匹配此 {RegExp} 的资源
+const productionGzipExtensions = /\.(js|css|json|txt|html|ico|svg)(\?.*)?$/i
 
 function resolve (dir) {
   return path.join(__dirname, dir)
@@ -40,8 +44,8 @@ const assetsCDN = {
 
 // vue.config.js
 const vueConfig = {
-  publicPath: process.env.NODE_ENV === 'production' ? '/blog-admin-web/' : '/',
-  // publicPath: '/',
+  // publicPath: process.env.NODE_ENV === 'production' ? '/blog-admin-web/' : '/',
+  publicPath: '/',
   configureWebpack: {
     // webpack plugins
     plugins: [
@@ -51,9 +55,7 @@ const vueConfig = {
         APP_VERSION: `"${require('./package.json').version}"`,
         GIT_HASH: JSON.stringify(getGitHash()),
         BUILD_DATE: buildDate
-      }),
-      // 依赖大小分析工具
-      new BundleAnalyzerPlugin()
+      })
     ],
     // if prod, add externals
     externals: isProd ? assetsCDN.externals : {}
@@ -111,7 +113,8 @@ const vueConfig = {
     // If you want to turn on the proxy, please remove the mockjs /src/main.jsL11
     proxy: {
       '/api': {
-        target: 'http://localhost:3000',
+        // target: 'http://localhost:3000',
+        target: 'http://192.168.50.13:3000',
         ws: false,
         changeOrigin: true
       }
@@ -130,6 +133,17 @@ if (process.env.VUE_APP_PREVIEW === 'true') {
   console.log('VUE_APP_PREVIEW', true)
   // add `ThemeColorReplacer` plugin to webpack plugins
   vueConfig.configureWebpack.plugins.push(createThemeColorReplacerPlugin())
+}
+
+if (process.env.NODE_ENV === 'production') {
+  vueConfig.configureWebpack.plugins.push(new BundleAnalyzerPlugin())
+  vueConfig.configureWebpack.plugins.push(new CompressionWebpackPlugin({
+    filename: '[path].gz[query]', // 目标资源名称
+    algorithm: 'gzip',
+    test: productionGzipExtensions, // 处理所有匹配此 {RegExp} 的资源
+    threshold: 10240, // 只处理比这个值大的资源。按字节计算(楼主设置10K以上进行压缩)
+    minRatio: 0.8 // 只有压缩率比这个值小的资源才会被处理
+  }))
 }
 
 module.exports = vueConfig
