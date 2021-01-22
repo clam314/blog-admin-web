@@ -114,10 +114,11 @@ export default {
     }
   },
   mounted () {
-    this.timer = setInterval(this.intervalSave, 2 * 60 * 1000)
+    // 暂停自动保存
+    // this.timer = setInterval(this.intervalSave, 2 * 60 * 1000)
   },
   beforeDestroy () {
-    clearInterval(this.timer)
+    // clearInterval(this.timer)
   },
   watch: {
     article (val) {

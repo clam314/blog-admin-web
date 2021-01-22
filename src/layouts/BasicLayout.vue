@@ -54,16 +54,14 @@ import { CONTENT_WIDTH_TYPE, SIDEBAR_TYPE, TOGGLE_MOBILE_TYPE } from '@/store/mu
 import defaultSettings from '@/config/defaultSettings'
 import RightContent from '@/components/GlobalHeader/RightContent'
 import GlobalFooter from '@/components/GlobalFooter'
-import Ads from '@/components/Other/CarbonAds'
-import LogoSvg from '../assets/logo.svg?inline'
+import LogoSvg from '../assets/logo2.svg?inline'
 
 export default {
   name: 'BasicLayout',
   components: {
     RightContent,
     GlobalFooter,
-    LogoSvg,
-    Ads
+    LogoSvg
   },
   data () {
     return {
@@ -155,7 +153,6 @@ export default {
       this.collapsed = val
     },
     handleSettingChange ({ type, value }) {
-      console.log('type', type, value)
       type && (this.settings[type] = value)
       switch (type) {
         case 'contentWidth':

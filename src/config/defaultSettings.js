@@ -23,7 +23,7 @@ export default {
   menu: {
     locale: true
   },
-  title: "Clam's blog",
+  title: 'Web前端实验室',
   pwa: false,
   iconfontUrl: '',
   production: process.env.NODE_ENV === 'production' && process.env.VUE_APP_PREVIEW !== 'true'
