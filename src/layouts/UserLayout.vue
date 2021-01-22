@@ -1,6 +1,6 @@
 <template>
 
-  <div id="userLayout" :class="['user-layout-wrapper', isMobile && 'mobile']">
+  <div id="userLayout" :class="['user-layout-wrapper', isMobile && 'mobile']" :style="{ backgroundImage: `url(${background})`}">
     <div class="container">
       <div class="user-layout-lang">
         <select-lang class="select-lang-trigger" />
@@ -9,25 +9,20 @@
         <div class="top">
           <div class="header">
             <a href="/">
-              <img src="~@/assets/logo.svg" class="logo" alt="logo">
-              <span class="title">Blog Back End</span>
+              <img src="~@/assets/logo2.svg" class="logo" alt="logo">
+              <span class="title">Web前端实验室管理后台</span>
             </a>
           </div>
           <div class="desc">
-            {{ $t('layouts.userLayout.title') }}
+            基于Ant Design Vue Pro 改造的博客管理后台
           </div>
         </div>
 
         <router-view />
 
         <div class="footer">
-<!--          <div class="links">-->
-<!--            <a href="_self">帮助</a>-->
-<!--            <a href="_self">隐私</a>-->
-<!--            <a href="_self">条款</a>-->
-<!--          </div>-->
           <div class="copyright">
-            Copyright &copy; 2020 clam314
+            {{ copyright }}
           </div>
         </div>
       </div>
@@ -45,6 +40,14 @@ export default {
     SelectLang
   },
   mixins: [deviceMixin],
+  computed: {
+    copyright () {
+      return `Copyright © ${new Date().getFullYear()} woods 保留所有权利`
+    },
+    background () {
+      return `${process.env.VUE_APP_API_HOST}${process.env.VUE_APP_API_BASE_URL}/blog/random?img=webp`
+    }
+  },
   mounted () {
     document.body.classList.add('userLayout')
   },
@@ -55,6 +58,13 @@ export default {
 </script>
 
 <style lang="less" scoped>
+#userLayout {
+  background-image: url(~@/assets/background.svg);
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+}
+
 #userLayout.user-layout-wrapper {
   height: 100%;
 
@@ -70,9 +80,9 @@ export default {
   .container {
     width: 100%;
     min-height: 100%;
-    background: #f0f2f5 url(~@/assets/background-1.jpg) no-repeat 50%;
+    backdrop-filter: saturate(180%) blur(5px);
+    background-color: rgba(0, 0, 0, 0.7);
     background-size: cover ;
-    //padding: 50px 0 84px;
     position: relative;
 
     .user-layout-lang {
@@ -122,7 +132,7 @@ export default {
 
           .title {
             font-size: 33px;
-            color: rgba(0, 0, 0, .85);
+            color: white;
             font-family: Avenir, 'Helvetica Neue', Arial, Helvetica, sans-serif;
             font-weight: 600;
             position: relative;
@@ -131,7 +141,7 @@ export default {
         }
         .desc {
           font-size: 14px;
-          color: rgba(0, 0, 0, 0.45);
+          color: rgba(255, 255, 255, 0.8);
           margin-top: 12px;
           margin-bottom: 40px;
         }
@@ -155,7 +165,7 @@ export default {
           margin-bottom: 8px;
           font-size: 14px;
           a {
-            color: rgba(0, 0, 0, 0.45);
+            color: whitesmoke;
             transition: all 0.3s;
             &:not(:last-child) {
               margin-right: 40px;
@@ -163,7 +173,7 @@ export default {
           }
         }
         .copyright {
-          color: rgba(0, 0, 0, 0.45);
+          color: whitesmoke;
           font-size: 14px;
         }
       }
