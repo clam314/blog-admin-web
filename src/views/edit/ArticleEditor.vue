@@ -141,6 +141,8 @@ export default {
       this.markdownForm.title = defaultTitle
       if (val) {
         this.getContent(val.tid)
+      } else {
+        this.spinning = true
       }
     }
   },
@@ -228,6 +230,7 @@ export default {
     deleteArticleSure () {
       if (!this.article || !this.article.tid) {
         this.$message.error('参数异常！')
+        this.showDeleteDialog = false
         return
       }
       this.deleteLoading = true

@@ -79,17 +79,7 @@ export default {
   watch: {
     folder (val) {
       if (val) {
-        this.data = []
-        this.noMore = false
-        this.pageNum = 0
-        this.getData(res => {
-          if (res.result.list.length > 0) {
-            this.data = res.result.list
-            this.onSelectChange(0, this.data[0])
-          } else {
-            this.onSelectChange(0, null)
-          }
-        })
+        this.firstGetData()
       }
     }
   },
@@ -97,6 +87,19 @@ export default {
     resetLoad (b) {
       this.loading = b
       this.busy = b
+    },
+    firstGetData () {
+      this.data = []
+      this.noMore = false
+      this.pageNum = 0
+      this.getData(res => {
+        if (res.result.list.length > 0) {
+          this.data = res.result.list
+          this.onSelectChange(0, this.data[0])
+        } else {
+          this.onSelectChange(0, null)
+        }
+      })
     },
     getData (callback) {
       this.resetLoad(true)
@@ -110,9 +113,9 @@ export default {
       }
       getArticles(param).then(res => {
         if (res.head && res.head.respCode === 200 && Array.isArray(res.result.list)) {
-          this.noMore = res.result.list.length === 0
           this.pageNum = res.result.pageNum + 1
           callback(res)
+          this.noMore = res.result.total <= this.data.length
         }
         this.resetLoad(false)
       }).catch(e => {

@@ -187,9 +187,11 @@ export default {
               this.$message.error(res.head.respMsg, 1)
             } else {
               this.articleBtnVisible = false
+              this.$refs.articleList.firstGetData()
             }
           }).catch(e => {
             this.confirmLoading = false
+            this.$message.error('新建文档异常', 1)
           })
         } else {
           return false
