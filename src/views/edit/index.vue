@@ -55,7 +55,11 @@
       </a-layout-sider>
 
       <a-layout-content style="margin: 0 0; width: 100% ;height: 100%;max-height: 100%">
-        <article-editor class="article-editor" :article="selectedArticle" :folders="folders" @update="handleArticleInfoUpdate" @delete="handleArticleDelete" />
+        <article-editor
+          ref="editor"
+          class="article-editor"
+          @updateInfo="handleArticleInfoUpdate"
+          @delete="handleArticleDelete" />
       </a-layout-content>
     </a-layout>
     <a-modal
@@ -114,7 +118,6 @@ export default {
       selectedKeys: [],
       mdValue: '',
       folders: [],
-      selectedArticle: null,
       selectedFolder: null,
       confirmLoading: false,
       folderRules: {
@@ -161,8 +164,13 @@ export default {
       console.log(e)
       this.selectedFolder = this.folders.filter(f => String(f.fid) === e.key)[0]
     },
+    // 文章列表选中回调
     onSelected (item) {
-      this.selectedArticle = item
+      if (item) {
+        this.$refs.editor.initEditor(item.tid, item.updateTime, this.folders)
+      } else {
+        this.$refs.editor.initEditor(null)
+      }
     },
     handleNewArticleClick () {
       if (this.selectedFolder === null || !this.selectedFolder.fid) {
@@ -218,13 +226,14 @@ export default {
         }
       })
     },
-    handleArticleInfoUpdate (newArticle, newFolderId) {
-      console.log('handleArticleInfoUpdate ', newArticle.title, '  ', newFolderId)
-      this.selectedArticle = newArticle
-      this.$refs.articleList.changeSelectedArticle(newArticle)
-      if (this.selectedFolder.fid !== newFolderId) {
+    // 文章信息更新后回调
+    handleArticleInfoUpdate (info) {
+      if (info.tid) {
+        this.$refs.articleList.changeSelectedArticle(info)
+      }
+      if (info.fid && this.selectedFolder.fid !== info.fid) {
         for (const item of this.folders) {
-          if (item.fid === newFolderId) {
+          if (item.fid === info.fid) {
             this.selectedFolder = item
             this.selectedKeys = [item.fid]
             return

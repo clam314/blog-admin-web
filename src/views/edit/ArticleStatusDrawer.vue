@@ -19,7 +19,7 @@
     <a-divider orientation="left">
       状态
     </a-divider>
-    <a-spin :spinning="preparingForm" >
+    <a-spin :spinning="loadingForm" >
       <a-form-model
         ref="ruleForm"
         :model="form"
@@ -29,14 +29,14 @@
       >
         <a-form-model-item label="文件夹" prop="folderId">
           <a-select v-model="form.folderId" placeholder="请选择所属文件夹">
-            <template v-for="folder in folders">
+            <template v-for="folder in folderList">
               <a-select-option :key="folder.fid">
                 {{ folder.name }}
               </a-select-option>
             </template>
           </a-select>
         </a-form-model-item>
-        <a-form-model-item label="发布" prop="publish">
+        <a-form-model-item label="发布中" prop="publish">
           <a-switch v-model="form.publish" />
         </a-form-model-item>
         <a-form-model-item label="状态" prop="status">
@@ -62,28 +62,41 @@
         </a-form-model-item>
       </a-form-model>
     </a-spin>
+
+    <!-- 发布设置项 -->
+    <a-divider orientation="left">
+      发布于
+    </a-divider>
+    <a-spin :spinning="loadingPublish">
+      <div class="publish-setting">
+        <span style="color: #333333">{{ publishTimeShow | momentStr('未发布','YYYY年MM月DD日 HH:mm:ss') }}</span>
+        <a-button type="primary" icon="cloud-upload" @click="handlePublish">
+          发布
+        </a-button>
+      </div>
+    </a-spin>
     <!-- 统计信息项 -->
     <a-divider orientation="left">
       统计
     </a-divider>
-    <a-spin :spinning="preparingStatistics" >
+    <a-spin :spinning="loadingNum" >
       <a-row type="flex" justify="center">
         <a-col :span="6" :offset="1">
-          <a-statistic title="阅读数" :value="article ? article.reads : 0">
+          <a-statistic title="阅读数" :value="info ? info.reads:0">
             <template #suffix>
               <a-icon type="eye" />
             </template>
           </a-statistic>
         </a-col>
         <a-col :span="6" :offset="1">
-          <a-statistic title="点赞数" :value="article ? article.like : 0" >
+          <a-statistic title="点赞数" :value="info ? info.like : 0" >
             <template #suffix>
               <a-icon type="like" />
             </template>
           </a-statistic>
         </a-col>
         <a-col :span="6" :offset="1">
-          <a-statistic title="评论数" :value="article ? article.comments : 0" >
+          <a-statistic title="评论数" :value="info ? info.comments : 0" >
             <template #suffix>
               <a-icon type="sound"/>
             </template>
@@ -96,7 +109,7 @@
       标签
     </a-divider>
     <div class="account-center-tags" style="padding: 0 10px">
-      <a-spin :spinning="tagsSpinning" >
+      <a-spin :spinning="loadingTags" >
         <template v-for="(tag, index) in tags" >
           <a-tooltip v-if="tag.length > 20" :key="index +String(tagsKey)" :title="tag">
             <a-tag
@@ -133,7 +146,7 @@
   </a-drawer>
 </template>
 <script>
-import { updateArticleInfo, updateArticleTags } from '@/api/article'
+import { updateArticleInfo, updateArticleTags, getBasicInfo, publishArticle } from '@/api/article'
 import Vue from 'vue'
 import { FormModel } from 'ant-design-vue'
 import TagSelectOption from '@/components/TagSelect/TagSelectOption'
@@ -142,21 +155,13 @@ Vue.use(FormModel)
 
 export default {
   components: { TagSelectOption },
-  props: {
-    article: {
-      type: Object,
-      default: null
-    },
-    folders: {
-      type: Array,
-      default: null
-    }
-  },
   data () {
     return {
       drawerVisible: false,
-      preparingForm: true,
-      preparingStatistics: true,
+      loadingForm: true,
+      loadingNum: true,
+      loadingPublish: true,
+      loadingTags: true,
 
       labelCol: { span: 4, offset: 0 },
       wrapperCol: { span: 18, offset: 1 },
@@ -170,94 +175,137 @@ export default {
         desc: ''
       },
       rules: {
-        folder: [{ required: true, message: 'Please select Activity zone', trigger: 'change' }],
-        status: [
-          {
-            type: 'array',
-            message: 'Please select at least one activity type',
-            trigger: 'change'
-          }
-        ],
+        folder: [{ required: true, message: '请选择移动到的文件夹', trigger: 'change' }],
+        status: [{ type: 'array', message: '请勾选', trigger: 'change' }],
         desc: [{ max: 200, message: '简单描述文章内容，请输入200字以内。', trigger: 'blur' }]
       },
 
       tagsKey: 0,
       tags: [],
-      tagsSpinning: false,
       tagInputVisible: false,
-      tagInputValue: ''
+      tagInputValue: '',
+
+      info: {
+        tid: '',
+        fid: '',
+        title: '',
+        content: '',
+        reads: 0,
+        like: 0,
+        comments: 0,
+        publishedTime: ''
+      },
+      folderList: [],
+      title: '',
+      content: '',
+      publishedTime: ''
     }
   },
-  mounted () {
-  },
-  watch: {
-    article (newVal) {
-      if (newVal) {
-        this.preparingStatistics = false
-        this.form.status = [];
-        [0, 1, 2].forEach(i => {
-          if (newVal[this.statusKeys[i]]) {
-            this.form.status.push(this.statusKeys[i])
-          }
-        })
-        this.tagsSpinning = false
-        this.tags = this.article.tags
+  computed: {
+    publishTimeShow () {
+      if (this.publishedTime !== '') {
+        return Number(this.publishedTime)
       } else {
-        this.preparingForm = true
-        this.preparingStatistics = true
-        this.form.publish = false
-        this.form.desc = ''
-        this.form.folderId = ''
-        this.form.status = []
-        this.tagsSpinning = true
-        this.tags = []
+        return ''
       }
-      this.initData()
-    },
-    folders () {
-      this.initData()
     }
   },
   methods: {
-    initData () {
-      if (!this.article || !this.folders) {
-        return
-      }
-      this.preparingForm = false
-      this.form.publish = Boolean(this.article.published)
-      this.form.desc = this.article.description || ''
-      this.form.folderId = this.article.fid
+    setLoading (reset = false) {
+      this.loadingForm = reset
+      this.loadingPublish = reset
+      this.loadingTags = reset
+      this.loadingNum = reset
     },
     closeInfoDrawer () {
       this.drawerVisible = false
     },
-    openInfoDrawer () {
+    openInfoDrawer (tid, title, content, folders) {
       this.drawerVisible = true
+      this.title = title || ''
+      this.content = content || ''
+      this.publishedTime = ''
+      this.folderList = folders || []
+      // 初始化信息
+      this.form.publish = false
+      this.form.desc = ''
+      this.form.folderId = ''
+      this.info = null
+      this.tags = []
+      this.form.status = []
+      // 获取信息
+      this.getInfo(tid)
     },
-
+    getInfo (tid) {
+      this.setLoading(true)
+      if (!tid) {
+        return
+      }
+      getBasicInfo({
+        tid
+      }).then(res => {
+        if (res.head.respCode === 200) {
+          const article = res.result
+          this.form.publish = Boolean(article.published)
+          this.form.desc = article.description || ''
+          this.form.folderId = article.fid
+          this.info = {}
+          this.info.tid = article.tid
+          this.info.fid = article.fid
+          this.info.reads = article.reads
+          this.info.like = article.like
+          this.info.comments = article.comments
+          this.publishedTime = article.publishedTime
+          this.tags = article.tags
+          this.form.status = [];
+          [0, 1, 2].forEach(i => {
+            if (article[this.statusKeys[i]]) {
+              this.form.status.push(this.statusKeys[i])
+            }
+          })
+        } else {
+          this.$message.error(res.head.respMsg)
+        }
+        this.setLoading(false)
+      }).catch(e => {
+        console.log(e)
+        this.$message.error('获取文章基本信息失败！')
+        this.setLoading(false)
+      })
+    },
     onSubmit () {
       this.$refs.ruleForm.validate(valid => {
+        if (!this.info) {
+          this.$message.error('参数异常，更新信息失败！')
+          return
+        }
         if (valid) {
           const param = {
-            tid: this.article.tid,
-            fid: this.article.fid,
+            tid: this.info.tid,
+            fid: this.info.fid,
             newFid: this.form.folderId,
             published: this.form.publish ? 1 : 0,
             status: this.form.status,
             description: this.form.desc
           }
-          this.preparingForm = true
-          const oldFid = this.article.fid
+          this.loadingForm = true
+          const oldFid = this.info.fid
           updateArticleInfo(param).then(res => {
             if (res.head && res.head.respCode === 200) {
-              this.drawerVisible = oldFid === res.result.article.fid
-              this.$emit('update', res.result.article, res.result.article.fid)
+              this.drawerVisible = oldFid === res.result.fid
+              this.$emit('update', {
+                tid: res.result.tid,
+                fid: res.result.fid,
+                published: res.result.published,
+                description: res.result.description,
+                updateTime: res.result.updateTime
+              })
             } else {
               this.$message.error(res.head.respMsg)
             }
-            this.preparingForm = false
+            this.loadingForm = false
           }).catch(e => {
-            this.preparingForm = false
+            this.loadingForm = false
           })
         } else {
           return false
@@ -289,7 +337,6 @@ export default {
       if (this.tagInputValue && !this.tags.includes(this.tagInputValue)) {
         this.updateTags(this.article.tid, this.tagInputValue, false, (newTag) => {
           this.tags = [...this.tags, newTag]
-          this.article.tags = this.tags
         }, reset)
       } else {
         reset()
@@ -314,6 +361,31 @@ export default {
         this.tagsSpinning = false
         this.$message.error('更新标签，请刷新页面或稍后重试！')
       })
+    },
+    handlePublish () {
+      if (!this.info || !this.title || !this.content) {
+        this.$message.error('参数异常，发布文章失败！')
+        return
+      }
+      this.loadingPublish = true
+      publishArticle({
+        tid: this.info.tid,
+        title: this.title,
+        content: this.content
+      }).then(res => {
+        if (res.head.respCode === 200) {
+          this.publishedTime = res.result.publishedTime
+          this.form.publish = res.result.published
+          this.$emit('update', { tid: res.result.tid, publishedTime: res.result.publishedTime, published: 1 })
+        } else {
+          this.$message.error(res.head.respMsg)
+        }
+        this.loadingPublish = false
+      }).catch(e => {
+        console.log(e)
+        this.$message.error('发布文章失败！')
+        this.loadingPublish = false
+      })
     }
   }
 }
@@ -330,6 +402,14 @@ export default {
 
 .article-content-status{
   margin-top: 15px;
+}
+
+.publish-setting {
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 80%;
 }
 
 </style>

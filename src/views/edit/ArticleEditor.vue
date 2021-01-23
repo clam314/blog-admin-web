@@ -33,7 +33,7 @@
           :previewBackground="markdown.previewBackground"
         />
       </a-layout-content>
-      <article-status-drawer ref="aStatus" :article="article" :folders="folders" @update="handleArticleUpdate"/>
+      <article-status-drawer ref="aStatus" @update="handleArticleUpdate"/>
     </a-layout>
     <a-modal
       title="删除文章"
@@ -61,18 +61,10 @@ export default {
   components: {
     ArticleStatusDrawer
   },
-  props: {
-    article: {
-     type: Object,
-     default: null
-    },
-    folders: {
-      type: Array,
-      default: null
-    }
-  },
   data () {
     return {
+      articleUpdateTime: '',
+      folders: [],
       spinning: true,
       deleteLoading: false,
       showDeleteDialog: false,
@@ -140,27 +132,22 @@ export default {
   },
   computed: {
     updateTimeShow () {
-      if (this.article && this.article.updateTime) {
-        return Number(this.article.updateTime)
-      } else {
-        return ''
-      }
-    }
-  },
-  watch: {
-    article (val) {
-      this.markdownForm.articleId = null
-      this.markdownForm.contentMarkdown = ''
-      this.markdownForm.title = defaultTitle
-      if (val) {
-        this.getContent(val.tid)
-      } else {
-        this.spinning = true
-      }
+      return this.articleUpdateTime !== '' ? Number(this.articleUpdateTime) : ''
     }
   },
   methods: {
+    initEditor (tid, updateTime, folders) {
+      this.articleUpdateTime = updateTime
+      this.folders = folders
+      this.markdownForm.articleId = tid
+      this.markdownForm.contentMarkdown = ''
+      this.markdownForm.title = defaultTitle
+      this.getContent(tid)
+    },
     getContent (tid) {
+      if (!tid) {
+        return
+      }
       this.spinning = true
       getArticleContent({
         tid: tid
@@ -207,7 +194,6 @@ export default {
       }
     },
     imgFilter (file) {
-      console.log(file)
       try {
         const ext = file.name.split('.').pop().toLowerCase()
         return ['jpg', 'jpeg', 'png', 'gif'].includes(ext)
@@ -241,14 +227,14 @@ export default {
       this.showDeleteDialog = true
     },
     deleteArticleSure () {
-      if (!this.article || !this.article.tid) {
+      if (!this.markdownForm.articleId) {
         this.$message.error('参数异常！')
         this.showDeleteDialog = false
         return
       }
       this.deleteLoading = true
       deleteArticle({
-        tid: this.article.tid
+        tid: this.markdownForm.articleId
       }).then(res => {
         if (res.head.respCode === 200) {
           this.$emit('delete', true)
@@ -265,10 +251,14 @@ export default {
       })
     },
     openInfoDrawer () {
-      this.$refs.aStatus.openInfoDrawer()
+      const { articleId, title, contentMarkdown } = this.markdownForm
+      this.$refs.aStatus.openInfoDrawer(articleId, title, contentMarkdown, this.folders)
     },
-    handleArticleUpdate (newArticle, folderId) {
-      this.$emit('update', newArticle, folderId)
+    handleArticleUpdate (info) {
+      if (info.updateTime) {
+        this.articleUpdateTime = info.updateTime
+      }
+      this.$emit('updateInfo', info)
     }
   }
 }

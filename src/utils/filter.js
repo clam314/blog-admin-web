@@ -21,3 +21,10 @@ Vue.filter('moment', function (dataStr, pattern = 'YYYY-MM-DD HH:mm:ss') {
   }
   return moment(dataStr).format(pattern)
 })
+
+Vue.filter('momentStr', function (dataStr, defaultStr = '', pattern = 'YYYY-MM-DD HH:mm:ss') {
+  if (!dataStr) {
+    return defaultStr
+  }
+  return moment(dataStr).format(pattern)
+})

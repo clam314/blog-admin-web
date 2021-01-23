@@ -2,12 +2,14 @@ import request from '@/utils/request'
 
 const articleApi = {
   GetArticles: '/article/list',
+  GetArticleBasicInfo: '/article/basic',
   GetArticleContent: 'article/getContent',
   AddArticle: '/article/add',
   SaveArticle: '/article/updateContent',
   UpdateTags: '/article/updateTags',
   UpdateInfo: '/article/updateInfo',
-  DeleteArticle: '/article/delete'
+  DeleteArticle: '/article/delete',
+  PublishArticle: 'article/publish'
 }
 
 /**
@@ -56,6 +58,15 @@ export function saveArticle (parameter) {
   })
 }
 
+// 获取文章的基本信息
+export function getBasicInfo (parameter) {
+  return request({
+    url: articleApi.GetArticleBasicInfo,
+    method: 'post',
+    data: parameter
+  })
+}
+
 // 修改文档标签
 export function updateArticleTags (parameter) {
   return request({
@@ -69,6 +80,15 @@ export function updateArticleTags (parameter) {
 export function updateArticleInfo (parameter) {
   return request({
     url: articleApi.UpdateInfo,
+    method: 'post',
+    data: parameter
+  })
+}
+
+// 发布文档
+export function publishArticle (parameter) {
+  return request({
+    url: articleApi.PublishArticle,
     method: 'post',
     data: parameter
   })
