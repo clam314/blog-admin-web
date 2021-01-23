@@ -15,6 +15,17 @@
       </a-col>
     </a-row>
 
+    <a-divider orientation="left">
+      封面
+    </a-divider>
+    <div class="ant-upload-preview" @click="$refs.modal.edit(info.tid)" >
+      <a-icon type="file-image" class="upload-icon"/>
+      <div class="mask">
+        <a-icon type="plus" />
+      </div>
+      <img :src="des_image" :onerror="`this.src='${require('@/assets/background.svg')}'`"/>
+    </div>
+    <image-modal ref="modal" @ok="setDesImage"/>
     <!-- 状态设置项 -->
     <a-divider orientation="left">
       状态
@@ -150,11 +161,12 @@ import { updateArticleInfo, updateArticleTags, getBasicInfo, publishArticle } fr
 import Vue from 'vue'
 import { FormModel } from 'ant-design-vue'
 import TagSelectOption from '@/components/TagSelect/TagSelectOption'
+import ImageModal from '@/views/edit/ImageModal'
 
 Vue.use(FormModel)
 
 export default {
-  components: { TagSelectOption },
+  components: { TagSelectOption, ImageModal },
   data () {
     return {
       drawerVisible: false,
@@ -198,7 +210,8 @@ export default {
       folderList: [],
       title: '',
       content: '',
-      publishedTime: ''
+      publishedTime: '',
+      des_image: ''
     }
   },
   computed: {
@@ -256,6 +269,7 @@ export default {
           this.info.like = article.like
           this.info.comments = article.comments
           this.publishedTime = article.publishedTime
+          this.des_image = article.des_image
           this.tags = article.tags
           this.form.status = [];
           [0, 1, 2].forEach(i => {
@@ -386,6 +400,9 @@ export default {
         this.$message.error('发布文章失败！')
         this.loadingPublish = false
       })
+    },
+    setDesImage (url) {
+      this.des_image = url
     }
   }
 }
@@ -410,6 +427,55 @@ export default {
   align-items: center;
   justify-content: space-between;
   width: 80%;
+}
+
+@upload-height:200px;
+.ant-upload-preview {
+  position: relative;
+  margin: 0 auto;
+  width: 100%;
+  border-radius: 5px;
+  border: 1px solid rgba(0,0,0,0.2);
+  min-height: @upload-height;
+
+  .upload-icon {
+    position: absolute;
+    top: 0.5em;
+    right: 10px;
+    font-size: 1.4rem;
+    padding: 0.5rem;
+    background: rgba(222, 221, 221, 0.7);
+    border-radius: 5px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+  }
+  .mask {
+    opacity: 0;
+    position: absolute;
+    background: rgba(0,0,0,0.4);
+    cursor: pointer;
+    transition: opacity 0.4s;
+
+    &:hover {
+      opacity: 1;
+    }
+
+    i {
+      font-size: 2rem;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      margin-left: -1rem;
+      margin-top: -1rem;
+      color: #d6d6d6;
+    }
+  }
+
+  img, .mask {
+    width: 100%;
+    height: 100%;
+    border-radius: 5px;
+    overflow: hidden;
+  }
 }
 
 </style>

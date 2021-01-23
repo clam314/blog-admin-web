@@ -9,7 +9,8 @@ const articleApi = {
   UpdateTags: '/article/updateTags',
   UpdateInfo: '/article/updateInfo',
   DeleteArticle: '/article/delete',
-  PublishArticle: 'article/publish'
+  PublishArticle: '/article/publish',
+  UpdateCover: '/article/updateCover'
 }
 
 /**
@@ -100,5 +101,17 @@ export function deleteArticle (parameter) {
     url: articleApi.DeleteArticle,
     method: 'post',
     data: parameter
+  })
+}
+
+// 上传文章封面
+export function updateCover (parameter) {
+  return request({
+    url: articleApi.UpdateCover,
+    method: 'post',
+    data: parameter,
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
   })
 }
