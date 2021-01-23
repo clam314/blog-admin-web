@@ -6,6 +6,10 @@
           class="editor-title"
           v-model="markdownForm.title"
           size="large">
+          <span slot="addonAfter">
+            <a-icon type="clock-circle"/>
+            {{ updateTimeShow |moment }}
+          </span>
           <a-icon slot="addonAfter" type="delete" @click="handleDeleteArticle" />
           <a-icon slot="addonAfter" type="menu-unfold" @click="openInfoDrawer"/>
         </a-input>
@@ -133,6 +137,15 @@ export default {
   },
   beforeDestroy () {
     // clearInterval(this.timer)
+  },
+  computed: {
+    updateTimeShow () {
+      if (this.article && this.article.updateTime) {
+        return Number(this.article.updateTime)
+      } else {
+        return ''
+      }
+    }
   },
   watch: {
     article (val) {
@@ -292,8 +305,16 @@ export default {
         margin-right: 20px;
         cursor: pointer;
       }
-      i:hover{
+      i:hover,i:hover{
         color: @primary-color;
+      }
+      span {
+        margin-right: 20px;
+        i {
+          margin-right: 2px;
+          font-size: 18px;
+          background-color: #fafafa;
+        }
       }
     }
   }

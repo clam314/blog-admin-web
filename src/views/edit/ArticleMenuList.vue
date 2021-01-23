@@ -21,8 +21,14 @@
           <a-list-item-meta>
             <a slot="title" class="list-title" :class="!collapsed? 'list-title-normal' : 'list-title-collapsed'">{{ item.title }}</a>
             <a-badge slot="avatar">
-              <a-icon slot="count" class="icon-color" type="check" v-if="item.published"/>
-              <a-avatar class="list-icon icon-color" :icon="fileIcon('md')" />
+              <a-icon
+                slot="count"
+                class="icon-color"
+                type="check-circle"
+                theme="twoTone"
+                twoToneColor="red"
+                v-if="item.published"/>
+              <a-avatar class="list-icon icon-color" shape="square" :icon="fileIcon('md')" />
             </a-badge>
             <div slot="description" class="list-description" :class="!collapsed? 'list-description-normal' : 'list-description-collapsed'">
               {{ item.description }}
