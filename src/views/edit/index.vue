@@ -162,9 +162,7 @@ export default {
       this.selectedFolder = this.folders.filter(f => String(f.fid) === e.key)[0]
     },
     onSelected (item) {
-      if (item) {
-        this.selectedArticle = item
-      }
+      this.selectedArticle = item
     },
     handleNewArticleClick () {
       if (this.selectedFolder === null || !this.selectedFolder.fid) {

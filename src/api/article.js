@@ -2,6 +2,7 @@ import request from '@/utils/request'
 
 const articleApi = {
   GetArticles: '/article/list',
+  GetArticleContent: 'article/getContent',
   AddArticle: '/article/add',
   SaveArticle: '/article/updateContent',
   UpdateTags: '/article/updateTags',
@@ -22,6 +23,15 @@ const articleApi = {
 export function getArticles (parameter) {
   return request({
     url: articleApi.GetArticles,
+    method: 'post',
+    data: parameter
+  })
+}
+
+// 获取文章内容
+export function getArticleContent (parameter) {
+  return request({
+    url: articleApi.GetArticleContent,
     method: 'post',
     data: parameter
   })

@@ -59,7 +59,6 @@ export default {
 
 <style lang="less" scoped>
 #userLayout {
-  background-image: url(~@/assets/background.svg);
   background-repeat: no-repeat;
   background-position: center center;
   background-size: cover;

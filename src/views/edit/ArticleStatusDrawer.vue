@@ -166,7 +166,7 @@ export default {
       form: {
         folderId: '',
         publish: false,
-        status: ['private'],
+        status: [],
         desc: ''
       },
       rules: {
@@ -202,6 +202,15 @@ export default {
         })
         this.tagsSpinning = false
         this.tags = this.article.tags
+      } else {
+        this.preparingForm = true
+        this.preparingStatistics = true
+        this.form.publish = false
+        this.form.desc = ''
+        this.form.folderId = ''
+        this.form.status = []
+        this.tagsSpinning = true
+        this.tags = []
       }
       this.initData()
     },

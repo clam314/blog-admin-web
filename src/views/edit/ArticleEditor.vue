@@ -36,7 +36,7 @@
 
 <script>
 import { uploadImg } from '@/api/articleImg'
-import { saveArticle } from '@/api/article'
+import { saveArticle, getArticleContent } from '@/api/article'
 import defaultSettings from '@/config/defaultSettings'
 import ArticleStatusDrawer from '@/views/edit/ArticleStatusDrawer'
 
@@ -122,26 +122,33 @@ export default {
   },
   watch: {
     article (val) {
+      this.markdownForm.articleId = null
+      this.markdownForm.contentMarkdown = ''
+      this.markdownForm.title = defaultTitle
       if (val) {
-        const { tid, title, content } = val
-        this.markdownForm.articleId = tid
-        this.markdownForm.title = title
-        this.markdownForm.contentMarkdown = content
-        this.initData()
-      }
-    },
-    folders (val) {
-      if (val) {
-        this.initData()
+        this.getContent(val.tid)
       }
     }
   },
   methods: {
-    initData () {
-      if (!this.article || !this.folders) {
-        return
-      }
-      this.spinning = false
+    getContent (tid) {
+      this.spinning = true
+      getArticleContent({
+        tid: tid
+      }).then(res => {
+        if (res.head.respCode === 200) {
+          const { tid, title, content } = res.result
+          this.markdownForm.articleId = tid
+          this.markdownForm.title = title
+          this.markdownForm.contentMarkdown = content
+        } else {
+          this.$message.error(res.head.respMsg)
+        }
+        this.spinning = false
+      }).catch(e => {
+        console.log(e)
+        this.spinning = false
+      })
     },
     save (value, render, auto = false) { // 保存文章内容
       const param = {

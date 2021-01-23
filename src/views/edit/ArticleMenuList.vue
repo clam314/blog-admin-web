@@ -86,6 +86,8 @@ export default {
           if (res.result.list.length > 0) {
             this.data = res.result.list
             this.onSelectChange(0, this.data[0])
+          } else {
+            this.onSelectChange(0, null)
           }
         })
       }
