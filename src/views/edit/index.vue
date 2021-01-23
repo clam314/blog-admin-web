@@ -55,7 +55,7 @@
       </a-layout-sider>
 
       <a-layout-content style="margin: 0 0; width: 100% ;height: 100%;max-height: 100%">
-        <article-editor class="article-editor" :article="selectedArticle" :folders="folders" @update="handleArticleInfoUpdate" />
+        <article-editor class="article-editor" :article="selectedArticle" :folders="folders" @update="handleArticleInfoUpdate" @delete="handleArticleDelete" />
       </a-layout-content>
     </a-layout>
     <a-modal
@@ -229,6 +229,12 @@ export default {
           }
         }
       }
+    },
+    handleArticleDelete (result) {
+      if (result) {
+        this.$message.success('删除文章成功,自动刷新页面。')
+        this.getDate()
+      }
     }
   },
   computed: {
@@ -240,9 +246,6 @@ export default {
     collapsed (newVal, oldVal) {
       if (newVal !== oldVal) {
         this.collapsedArticleList = this.collapsed
-        // setTimeout(() => {
-        //   this.collapsedArticleList = this.collapsed
-        // }, 300)
       }
     }
   }

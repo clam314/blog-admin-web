@@ -6,7 +6,7 @@
           class="editor-title"
           v-model="markdownForm.title"
           size="large">
-          <a-icon slot="addonAfter" type="delete" @click="deleteArticle" />
+          <a-icon slot="addonAfter" type="delete" @click="handleDeleteArticle" />
           <a-icon slot="addonAfter" type="menu-unfold" @click="openInfoDrawer"/>
         </a-input>
       </a-layout-header>
@@ -31,12 +31,24 @@
       </a-layout-content>
       <article-status-drawer ref="aStatus" :article="article" :folders="folders" @update="handleArticleUpdate"/>
     </a-layout>
+    <a-modal
+      title="删除文章"
+      :visible="showDeleteDialog"
+      :confirm-loading="deleteLoading"
+      ok-text="删除"
+      :mask-closable="false"
+      :closable="false"
+      @ok="deleteArticleSure"
+      @cancel="()=>{this.showDeleteDialog=false}"
+    >
+      <p>是否确定删除文章，本操作执行后不可恢复！</p>
+    </a-modal>
   </a-spin>
 </template>
 
 <script>
 import { uploadImg } from '@/api/articleImg'
-import { saveArticle, getArticleContent } from '@/api/article'
+import { saveArticle, getArticleContent, deleteArticle } from '@/api/article'
 import defaultSettings from '@/config/defaultSettings'
 import ArticleStatusDrawer from '@/views/edit/ArticleStatusDrawer'
 
@@ -58,6 +70,8 @@ export default {
   data () {
     return {
       spinning: true,
+      deleteLoading: false,
+      showDeleteDialog: false,
       markdown: {
         codeStyle: 'atom-one-dark',
         editorBackground: '#fafafa',
@@ -208,8 +222,31 @@ export default {
     editorChange (value, render) {
       this.markdownForm.contentHtml = render
     },
-    deleteArticle () {
-      this.$message.info('该功能暂时未开放')
+    handleDeleteArticle () {
+      this.showDeleteDialog = true
+    },
+    deleteArticleSure () {
+      if (!this.article || !this.article.tid) {
+        this.$message.error('参数异常！')
+        return
+      }
+      this.deleteLoading = true
+      deleteArticle({
+        tid: this.article.tid
+      }).then(res => {
+        if (res.head.respCode === 200) {
+          this.$emit('delete', true)
+        } else {
+          this.$message.error(res.head.respMsg)
+        }
+        this.deleteLoading = false
+        this.showDeleteDialog = false
+      }).catch(e => {
+        console.log(e)
+        this.$message.error('删除失败！')
+        this.deleteLoading = false
+        this.showDeleteDialog = false
+      })
     },
     openInfoDrawer () {
       this.$refs.aStatus.openInfoDrawer()

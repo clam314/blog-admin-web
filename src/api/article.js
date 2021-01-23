@@ -6,7 +6,8 @@ const articleApi = {
   AddArticle: '/article/add',
   SaveArticle: '/article/updateContent',
   UpdateTags: '/article/updateTags',
-  UpdateInfo: '/article/updateInfo'
+  UpdateInfo: '/article/updateInfo',
+  DeleteArticle: '/article/delete'
 }
 
 /**
@@ -68,6 +69,15 @@ export function updateArticleTags (parameter) {
 export function updateArticleInfo (parameter) {
   return request({
     url: articleApi.UpdateInfo,
+    method: 'post',
+    data: parameter
+  })
+}
+
+// 删除文章
+export function deleteArticle (parameter) {
+  return request({
+    url: articleApi.DeleteArticle,
     method: 'post',
     data: parameter
   })
