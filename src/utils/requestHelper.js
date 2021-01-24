@@ -1,6 +1,6 @@
 import md5 from 'js-md5'
 import JSEncrypt from 'jsencrypt'
-import { pubKey, appKey } from '@/config/request.config'
+import { appKey, pubKey } from '@/config/request.config'
 
 const $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
 
@@ -41,7 +41,8 @@ function createUUID () {
 export function getRsaCode (str) {
   const encryptStr = new JSEncrypt()
   encryptStr.setPublicKey(pubKey)
-  return encryptStr.encrypt(str.toString())
+  const res = encryptStr.encrypt(str)
+  return res
 }
 
 /**
