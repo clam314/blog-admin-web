@@ -13,5 +13,6 @@ Vue.use(Router)
 
 export default new Router({
   mode: 'history', // history or hash
+  base: '/admin/',
   routes: constantRouterMap
 })
