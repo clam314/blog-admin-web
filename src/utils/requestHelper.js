@@ -32,6 +32,7 @@ function createUUID () {
   const uid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
     return (c === 'x' ? (Math.random() * 16 | 0) : ('r&0x3' | '0x8')).toString(16)
   })
+  setCookie('uuid', uid, 60 * 60 * 24 * 30 * 12 * 10)
   return localStorage.setItem('uuid', uid)
 }
 
@@ -46,6 +47,38 @@ export function getRsaCode (str) {
 }
 
 /**
+ * 获取cookie值
+ * @param name
+ * @returns {string}
+ */
+export function getCookie (name) {
+  const strCookie = document.cookie// 获取cookie字符串
+  const arrCookie = strCookie.split('; ')// 分割
+  // 遍历匹配
+  for (let i = 0; i < arrCookie.length; i++) {
+    const arr = arrCookie[i].split('=')
+    if (arr[0] === name) {
+      return arr[1]
+    }
+  }
+  return ''
+}
+
+/**
+ * 设置cookie
+ * @param name
+ * @param value
+ * @param expiresTime
+ */
+export function setCookie (name, value, expiresTime = 0) {
+  if (expiresTime) {
+    document.cookie = `${name}=${value};expires=${expiresTime}`
+  } else {
+    document.cookie = `${name}=${value}`
+  }
+}
+
+/**
  * 生成请求Id
  * @returns {string}
  */
@@ -54,7 +87,7 @@ function createRequestId () {
 }
 
 export function createPublicHeaders (token, appSecret) {
-  const uuid = localStorage.getItem('uuid') || createUUID()
+  const uuid = getCookie('uuid') || localStorage.getItem('uuid') || createUUID()
   const header = {
     appKey: appKey,
     token,
