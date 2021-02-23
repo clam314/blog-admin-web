@@ -67,21 +67,55 @@
       <div class="salesCard">
         <a-tabs default-active-key="1" size="large" :tab-bar-style="{paddingLeft: '16px'}">
           <div class="extra-wrapper" slot="tabBarExtraContent">
-            <div class="extra-item">
-              <a>今日</a>
-              <a>本周</a>
-              <a>本月</a>
-              <a>全年</a>
-            </div>
-            <a-range-picker :style="{width: '256px'}" />
+            <a-radio-group v-model="dateRange">
+              <a-radio-button value="a">
+                近7天
+              </a-radio-button>
+              <a-radio-button value="b">
+                近14天
+              </a-radio-button>
+              <a-radio-button value="c">
+                近30天
+              </a-radio-button>
+              <a-radio-button value="d">
+                近90天
+              </a-radio-button>
+            </a-radio-group>
           </div>
-          <a-tab-pane loading="true" tab="访问量" key="1">
+          <a-tab-pane loading="true" tab="阅读量" key="1">
             <a-row>
               <a-col :xl="16" :lg="12" :md="12" :sm="24" :xs="24">
-                <bar :data="barData" title="访问趋势" />
+                <bar :data="barData" title="阅读趋势" />
               </a-col>
               <a-col :xl="8" :lg="12" :md="12" :sm="24" :xs="24">
                 <rank-list title="阅读排名TOP5" :list="rankList" />
+              </a-col>
+            </a-row>
+          </a-tab-pane>
+          <a-tab-pane loading="true" tab="访问量" key="2">
+            <a-row>
+              <a-col :xl="24" :lg="24" :md="24" :sm="24" :xs="24">
+                <bar :data="barData" title="访问趋势" />
+              </a-col>
+            </a-row>
+          </a-tab-pane>
+          <a-tab-pane loading="true" tab="访客数" key="3">
+            <a-row>
+              <a-col :xl="16" :lg="12" :md="12" :sm="24" :xs="24">
+                <bar :data="barData" title="访客趋势" />
+              </a-col>
+              <a-col :xl="8" :lg="12" :md="12" :sm="24" :xs="24">
+                <rank-list title="访客排名TOP5" :list="rankList" />
+              </a-col>
+            </a-row>
+          </a-tab-pane>
+          <a-tab-pane loading="true" tab="IP数" key="4">
+            <a-row>
+              <a-col :xl="16" :lg="12" :md="12" :sm="24" :xs="24">
+                <bar :data="barData" title="IP请求趋势" />
+              </a-col>
+              <a-col :xl="8" :lg="12" :md="12" :sm="24" :xs="24">
+                <rank-list title="IP排名TOP5" :list="rankList" />
               </a-col>
             </a-row>
           </a-tab-pane>
@@ -184,7 +218,9 @@ export default {
       pieStyle: {
         stroke: '#fff',
         lineWidth: 1
-      }
+      },
+
+      dateRange: 'a'
     }
   },
   computed: {
