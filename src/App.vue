@@ -13,7 +13,7 @@ import { mapActions } from 'vuex'
 
 export default {
   beforeMount () {
-    this.Initial() // 获取初始化信息
+    this.Initial()
   },
   data () {
     return {
