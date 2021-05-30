@@ -1,6 +1,6 @@
 const path = require('path')
 const webpack = require('webpack')
-const GitRevisionPlugin = require('git-revision-webpack-plugin')
+const { GitRevisionPlugin } = require('git-revision-webpack-plugin')
 const GitRevision = new GitRevisionPlugin()
 const buildDate = JSON.stringify(new Date().toLocaleString())
 const createThemeColorReplacerPlugin = require('./config/plugin.config')
@@ -44,7 +44,6 @@ const assetsCDN = {
 
 // vue.config.js
 const vueConfig = {
-  // publicPath: process.env.NODE_ENV === 'production' ? '/admin/' : '/',
   publicPath: '/admin/',
   configureWebpack: {
     // webpack plugins
@@ -52,9 +51,11 @@ const vueConfig = {
       // Ignore all locale files of moment.js
       new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
       new webpack.DefinePlugin({
-        APP_VERSION: `"${require('./package.json').version}"`,
-        GIT_HASH: JSON.stringify(getGitHash()),
-        BUILD_DATE: buildDate
+        process: {
+          APP_VERSION: `"${require('./package.json').version}"`,
+          GIT_HASH: JSON.stringify(getGitHash()),
+          BUILD_DATE: buildDate
+        }
       })
     ],
     // if prod, add externals
