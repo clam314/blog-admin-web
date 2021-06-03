@@ -327,9 +327,9 @@ export default {
       })
     },
     handleTagClose (removeTag) {
-      this.updateTags(this.article.tid, removeTag, true, (rTag) => {
+      this.updateTags(this.info.tid, removeTag, true, (rTag) => {
         this.tags = this.tags.filter(tag => tag !== rTag)
-        this.article.tags = this.tags
+        this.info.tags = this.tags
       }, () => {
         this.tagsKey = new Date().getTime() // 标签关闭在网络请求前，失败后需要重新显示
       })
@@ -349,7 +349,7 @@ export default {
         this.tagInputValue = ''
       }
       if (this.tagInputValue && !this.tags.includes(this.tagInputValue)) {
-        this.updateTags(this.article.tid, this.tagInputValue, false, (newTag) => {
+        this.updateTags(this.info.tid, this.tagInputValue, false, (newTag) => {
           this.tags = [...this.tags, newTag]
         }, reset)
       } else {
