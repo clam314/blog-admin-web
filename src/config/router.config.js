@@ -12,24 +12,30 @@ export const asyncRouterMap = [
     name: 'index',
     component: BasicLayout,
     meta: { title: 'menu.home' },
-    redirect: '/dashboard/analysis/:pageNo([1-9]\\d*)?',
+    redirect: '/account/center',
     children: [
       // dashboard
+      // {
+      //   path: '/dashboard',
+      //   name: 'dashboard',
+      //   redirect: '/dashboard/analysis',
+      //   component: RouteView,
+      //   hideChildrenInMenu: true,
+      //   meta: { title: 'menu.dashboard', keepAlive: true, icon: bxAnaalyse, permission: ['dashboard'] },
+      //   children: [
+      //     {
+      //       path: '/dashboard/analysis/:pageNo([1-9]\\d*)?',
+      //       name: 'Analysis',
+      //       component: () => import(/* webpackChunkName: "dashboard" */ '@/views/dashboard/Analysis'),
+      //       meta: { title: 'menu.dashboard.analysis', keepAlive: false, permission: ['dashboard'] }
+      //     }
+      //   ]
+      // },
+      // 外部链接
       {
-        path: '/dashboard',
+        path: 'https://tongji.baidu.com/web/10000368593/homepage/index/',
         name: 'dashboard',
-        redirect: '/dashboard/analysis',
-        component: RouteView,
-        hideChildrenInMenu: true,
-        meta: { title: 'menu.dashboard', keepAlive: true, icon: bxAnaalyse, permission: ['dashboard'] },
-        children: [
-          {
-            path: '/dashboard/analysis/:pageNo([1-9]\\d*)?',
-            name: 'Analysis',
-            component: () => import(/* webpackChunkName: "dashboard" */ '@/views/dashboard/Analysis'),
-            meta: { title: 'menu.dashboard.analysis', keepAlive: false, permission: ['dashboard'] }
-          }
-        ]
+        meta: { title: 'menu.dashboard.monitor', target: '_blank', icon: bxAnaalyse, permission: ['dashboard'] }
       },
       {
         path: '/article',
